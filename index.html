@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlantis Charters · Mallorca</title>
+  <meta name="description" content="Experiencias únicas a bordo de un llaut mallorquín tradicional. Charter náutico en Mallorca, Mediterráneo.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       CSS CUSTOM PROPERTIES
+    ============================================================ */
+    :root {
+      --terracotta:      #C8574A;
+      --terracotta-dark: #A8473C;
+      --terracotta-10:   rgba(200, 87, 74, 0.10);
+      --ocean:           #2A6E8A;
+      --ocean-light:     #3A8EAA;
+      --cream:           #FAF7F2;
+      --sand:            #F5F0E8;
+      --sand-dark:       #EDE8DF;
+      --dark:            #1C1C1A;
+      --white:           #FFFFFF;
+      --text-dark:       #1C1C1A;
+      --text-mid:        #5A5752;
+      --text-light:      #9A9590;
+
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body:    'DM Sans', -apple-system, sans-serif;
+
+      --nav-h: 72px;
+      --ease:  cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* ============================================================
+       RESET
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html  { scroll-behavior: smooth; }
+    body  {
+      font-family: var(--font-body);
+      color: var(--text-dark);
+      background: var(--cream);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    img   { display: block; max-width: 100%; height: auto; }
+    a     { color: inherit; text-decoration: none; }
+    input, select, textarea, button { font-family: var(--font-body); }
+
+    /* ============================================================
+       NAVIGATION
+    ============================================================ */
+    .nav {
+      position: fixed;
+      inset-block-start: 0;
+      inset-inline: 0;
+      z-index: 900;
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(20px, 5vw, 64px);
+      transition: background .4s var(--ease), box-shadow .4s var(--ease), backdrop-filter .4s var(--ease);
+    }
+
+    .nav.scrolled {
+      background: rgba(255,255,255,.93);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      box-shadow: 0 1px 0 rgba(0,0,0,.07), 0 4px 24px rgba(0,0,0,.07);
+    }
+
+    /* Logo */
+    .nav-logo img {
+      height: 44px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      transition: filter .4s var(--ease);
+    }
+    .nav.scrolled .nav-logo img { filter: none; }
+
+    /* Desktop links */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.88);
+      position: relative;
+      transition: color .25s;
+    }
+    .nav.scrolled .nav-links a { color: var(--text-dark); }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0; right: 0;
+      height: 1.5px;
+      background: var(--terracotta);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .3s var(--ease);
+    }
+    .nav-links a:hover::after,
+    .nav-links a.active::after { transform: scaleX(1); }
+    .nav-links a.active,
+    .nav.scrolled .nav-links a.active { color: var(--terracotta); }
+
+    /* Reservar pill */
+    .nav-links .nav-cta {
+      background: var(--terracotta);
+      color: #fff !important;
+      padding: 9px 22px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      transition: background .2s, transform .15s;
+    }
+    .nav-links .nav-cta::after { display: none; }
+    .nav-links .nav-cta:hover  { background: var(--terracotta-dark); }
+    .nav-links .nav-cta:active { transform: scale(.97); }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 1.5px;
+      background: #fff;
+      transition: all .3s;
+    }
+    .nav.scrolled .hamburger span { background: var(--dark); }
+    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* Full-screen mobile menu */
+    .mobile-menu {
+      position: fixed;
+      inset: 0;
+      background: var(--cream);
+      z-index: 800;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 36px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+    }
+    .mobile-menu.open { opacity: 1; pointer-events: all; }
+    .mobile-menu a {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 40px;
+      color: var(--text-dark);
+      transition: color .2s;
+    }
+    .mobile-menu a:hover { color: var(--terracotta); }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    #inicio {
+      position: relative;
+      width: 100%;
+      height: 100svh;
+      min-height: 620px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,.15) 0%,
+        rgba(0,0,0,.40) 55%,
+        rgba(0,0,0,.60) 100%
+      );
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 clamp(20px, 6vw, 80px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero-tag {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.7);
+      margin-bottom: 18px;
+      opacity: 0;
+      animation: fadeUp .8s var(--ease) .15s forwards;
+    }
+
+    .hero-headline {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 600;
+      font-size: clamp(52px, 8.5vw, 100px);
+      color: #fff;
+      line-height: 1.05;
+      margin-bottom: 18px;
+      text-shadow: 0 2px 48px rgba(0,0,0,.28);
+      opacity: 0;
+      animation: fadeUp .9s var(--ease) .35s forwards;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(15px, 2vw, 18px);
+      font-weight: 300;
+      color: rgba(255,255,255,.82);
+      max-width: 460px;
+      line-height: 1.65;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp .9s var(--ease) .55s forwards;
+    }
+
+    /* ---- Booking bar ---- */
+    .booking-bar {
+      display: flex;
+      align-items: stretch;
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 64px;
+      padding: 8px 8px 8px 4px;
+      gap: 0;
+      width: min(760px, calc(100vw - 40px));
+      box-shadow: 0 24px 64px rgba(0,0,0,.35), 0 4px 16px rgba(0,0,0,.18);
+      opacity: 0;
+      animation: fadeUp 1s var(--ease) .75s forwards;
+    }
+
+    .bfield {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8px 18px;
+      border-right: 1px solid rgba(0,0,0,.09);
+      min-width: 0;
+    }
+    .bfield:last-of-type { border-right: none; }
+
+    .bfield label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: 3px;
+      cursor: pointer;
+    }
+
+    .bfield input,
+    .bfield select {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-dark);
+      background: none;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      padding: 0;
+    }
+    .bfield input[type="date"]::-webkit-calendar-picker-indicator {
+      opacity: .35;
+      cursor: pointer;
+    }
+
+    .booking-cta {
+      flex-shrink: 0;
+      background: var(--terracotta);
+      color: #fff;
+      border: none;
+      border-radius: 56px;
+      padding: 13px 26px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .22s, transform .15s;
+      align-self: center;
+    }
+    .booking-cta:hover  { background: var(--terracotta-dark); }
+    .booking-cta:active { transform: scale(.97); }
+
+    /* Scroll cue */
+    .scroll-cue {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      animation: fadeUp .8s var(--ease) 1.2s forwards;
+    }
+    .scroll-cue span {
+      font-size: 9.5px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.5);
+      font-weight: 500;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 36px;
+      background: rgba(255,255,255,.3);
+      overflow: hidden;
+      position: relative;
+    }
+    .scroll-line::after {
+      content: '';
+      position: absolute;
+      top: -100%; left: 0;
+      width: 100%; height: 100%;
+      background: #fff;
+      animation: lineDown 1.8s ease infinite;
+    }
+
+    /* ============================================================
+       SHARED SECTION UTILITIES
+    ============================================================ */
+    .section-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .26em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 14px;
+    }
+
+    .section-headline {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 600;
+      line-height: 1.12;
+      color: var(--text-dark);
+    }
+
+    /* Scroll-reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .75s var(--ease), transform .75s var(--ease);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: .10s; }
+    .reveal-d2 { transition-delay: .20s; }
+    .reveal-d3 { transition-delay: .30s; }
+    .reveal-d4 { transition-delay: .42s; }
+
+    /* ============================================================
+       EXPERIENCE
+    ============================================================ */
+    #experiencia {
+      background: var(--white);
+      padding: clamp(80px, 10vw, 140px) clamp(24px, 7vw, 100px);
+    }
+
+    .exp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(48px, 7vw, 96px);
+      align-items: center;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .exp-text .section-headline {
+      font-size: clamp(30px, 3.8vw, 50px);
+      margin-bottom: 22px;
+      max-width: 440px;
+    }
+
+    .exp-text p {
+      font-size: 15.5px;
+      line-height: 1.78;
+      color: var(--text-mid);
+      font-weight: 300;
+      margin-bottom: 38px;
+    }
+
+    .highlights { display: flex; flex-direction: column; gap: 12px; }
+
+    .hl-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 15px 18px;
+      background: var(--sand);
+      border-radius: 14px;
+      transition: background .25s;
+    }
+    .hl-item:hover { background: var(--sand-dark); }
+
+    .hl-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; line-height: 1; }
+
+    .hl-text strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 2px;
+    }
+    .hl-text span { font-size: 13px; color: var(--text-mid); font-weight: 300; }
+
+    /* Feature image */
+    .exp-image { position: relative; }
+    .exp-image img {
+      width: 100%;
+      height: clamp(360px, 42vw, 580px);
+      object-fit: cover;
+      border-radius: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .exp-image::after {
+      content: '';
+      position: absolute;
+      inset: 20px -20px -20px 20px;
+      border: 2px solid var(--terracotta);
+      border-radius: 20px;
+      opacity: .18;
+      z-index: 0;
+    }
+
+    /* ============================================================
+       BOAT SECTION
+    ============================================================ */
+    #barco {
+      background: var(--sand);
+      padding: clamp(80px, 10vw, 140px) clamp(24px, 7vw, 100px);
+    }
+
+    .boat-inner { max-width: 1100px; margin: 0 auto; }
+
+    .boat-header {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+    .boat-header .section-headline {
+      font-size: clamp(34px, 4.5vw, 58px);
+      margin-bottom: 14px;
+    }
+    .boat-header p {
+      font-size: 15.5px;
+      color: var(--text-mid);
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.72;
+      font-weight: 300;
+    }
+
+    /* Specs strip */
+    .specs-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      border-radius: 16px;
+      overflow: hidden;
+      max-width: 620px;
+      margin: 0 auto 52px;
+    }
+    .spec {
+      background: var(--white);
+      padding: 28px 20px;
+      text-align: center;
+      transition: background .25s;
+    }
+    .spec:hover { background: #FDFBF8; }
+    .spec-val {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 30px;
+      font-weight: 600;
+      color: var(--terracotta);
+      margin-bottom: 6px;
+    }
+    .spec-lbl {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+    }
+
+    /* Boat image */
+    .boat-img-wrap {
+      border-radius: 24px;
+      overflow: hidden;
+      line-height: 0;
+    }
+    .boat-img-wrap img {
+      width: 100%;
+      height: clamp(300px, 38vw, 500px);
+      object-fit: cover;
+      transition: transform .7s var(--ease);
+    }
+    .boat-img-wrap:hover img { transform: scale(1.03); }
+
+    /* ============================================================
+       GALLERY
+    ============================================================ */
+    #galeria {
+      background: var(--white);
+      padding: clamp(60px, 8vw, 100px) clamp(16px, 3.5vw, 52px);
+    }
+
+    .gallery-hd {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .gallery-hd .section-headline { font-size: clamp(26px, 3.6vw, 46px); }
+
+    /* 3-col masonry-style grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 240px 240px;
+      gap: 10px;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    /* Make items 1 and 4 span 2 rows for asymmetry */
+    .gallery-grid .gi:nth-child(1) { grid-row: span 2; }
+    .gallery-grid .gi:nth-child(4) { grid-row: span 2; }
+
+    .gi {
+      overflow: hidden;
+      border-radius: 14px;
+      cursor: pointer;
+      position: relative;
+    }
+    .gi img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .5s var(--ease);
+    }
+    .gi:hover img { transform: scale(1.06); }
+    .gi::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(200,87,74,.18), transparent);
+      opacity: 0;
+      transition: opacity .4s;
+    }
+    .gi:hover::after { opacity: 1; }
+
+    /* ============================================================
+       BOOKING / CONTACT
+    ============================================================ */
+    #reservar {
+      background: var(--terracotta);
+      padding: clamp(80px, 10vw, 130px) clamp(24px, 7vw, 100px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Wave top */
+    #reservar::before {
+      content: '';
+      position: absolute;
+      top: -80px;
+      left: 0; right: 0;
+      height: 120px;
+      background: var(--white);
+      clip-path: ellipse(58% 100% at 50% 0%);
+    }
+
+    .res-inner {
+      max-width: 660px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .res-inner .section-tag   { color: rgba(255,255,255,.68); }
+    .res-inner .section-headline {
+      font-size: clamp(34px, 5vw, 58px);
+      color: #fff;
+      margin-bottom: 14px;
+    }
+
+    .res-sub {
+      font-size: 16px;
+      color: rgba(255,255,255,.84);
+      font-weight: 300;
+      line-height: 1.66;
+      margin-bottom: 44px;
+    }
+
+    /* Form */
+    .cform {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      text-align: left;
+      margin-bottom: 36px;
+    }
+    .frow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+    }
+    .ffield { display: flex; flex-direction: column; gap: 5px; }
+    .ffield label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.66);
+    }
+    .ffield input,
+    .ffield textarea {
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.24);
+      border-radius: 10px;
+      padding: 13px 15px;
+      font-size: 14px;
+      color: #fff;
+      outline: none;
+      transition: border-color .22s, background .22s;
+    }
+    .ffield input::placeholder,
+    .ffield textarea::placeholder { color: rgba(255,255,255,.38); }
+    .ffield input:focus,
+    .ffield textarea:focus {
+      border-color: rgba(255,255,255,.55);
+      background: rgba(255,255,255,.20);
+    }
+    .ffield textarea { resize: vertical; min-height: 108px; }
+
+    .submit-btn {
+      width: 100%;
+      background: #fff;
+      color: var(--terracotta);
+      border: none;
+      border-radius: 50px;
+      padding: 16px 40px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .22s, box-shadow .22s, transform .15s;
+      box-shadow: 0 4px 24px rgba(0,0,0,.15);
+    }
+    .submit-btn:hover  { background: var(--cream); box-shadow: 0 8px 32px rgba(0,0,0,.22); }
+    .submit-btn:active { transform: scale(.98); }
+
+    /* Success */
+    .form-success {
+      display: none;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 18px;
+      padding: 36px 28px;
+    }
+    .form-success.show { display: block; }
+    .form-success h3 {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 30px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .form-success p { color: rgba(255,255,255,.8); font-weight: 300; font-size: 15px; }
+
+    /* Contact strip */
+    .contact-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px 28px;
+      margin-top: 36px;
+      padding-top: 36px;
+      border-top: 1px solid rgba(255,255,255,.2);
+    }
+    .ci {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: rgba(255,255,255,.82);
+    }
+    .ci a { color: #fff; font-weight: 500; transition: opacity .2s; }
+    .ci a:hover { opacity: .75; }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      background: var(--dark);
+      padding: 44px clamp(24px, 5vw, 80px);
+    }
+    .foot-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .foot-logo img {
+      height: 34px;
+      filter: brightness(0) invert(1);
+      opacity: .7;
+    }
+    .foot-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+    .foot-links a {
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.38);
+      transition: color .22s;
+    }
+    .foot-links a:hover { color: rgba(255,255,255,.75); }
+    .foot-copy {
+      font-size: 11.5px;
+      color: rgba(255,255,255,.28);
+      letter-spacing: .04em;
+    }
+
+    /* ============================================================
+       KEYFRAME ANIMATIONS
+    ============================================================ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes lineDown {
+      0%   { top: -100%; }
+      100% { top:  100%; }
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+
+    /* Tablet */
+    @media (max-width: 960px) {
+      .exp-grid {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+      .exp-image::after { display: none; }
+      .exp-image img { height: 380px; }
+      .exp-text .section-headline { max-width: none; }
+
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+      }
+      .gallery-grid .gi:nth-child(1),
+      .gallery-grid .gi:nth-child(4) { grid-row: span 1; }
+      .gallery-grid .gi { height: 260px; }
+      .gallery-grid .gi img { height: 100%; }
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .nav-links  { display: none; }
+      .hamburger  { display: flex; }
+
+      /* Booking bar → vertical pill → card */
+      .booking-bar {
+        flex-direction: column;
+        border-radius: 20px;
+        padding: 14px 16px;
+        gap: 0;
+        align-items: stretch;
+      }
+      .bfield {
+        border-right: none;
+        border-bottom: 1px solid rgba(0,0,0,.09);
+        padding: 10px 12px;
+      }
+      .bfield:last-of-type { border-bottom: none; }
+      .booking-cta {
+        margin-top: 10px;
+        padding: 15px;
+        align-self: auto;
+        border-radius: 12px;
+        text-align: center;
+      }
+
+      .foot-inner { flex-direction: column; text-align: center; }
+      .foot-links { justify-content: center; }
+
+      .frow { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 520px) {
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+      .gallery-grid .gi { height: 260px; }
+      .specs-row { grid-template-columns: 1fr; }
+      .contact-strip { flex-direction: column; align-items: center; text-align: center; }
+    }
+
+    /* ============================================================
+       REVIEWS
+    ============================================================ */
+    #resenas {
+      background: var(--white);
+      padding: clamp(80px, 10vw, 130px) clamp(24px, 6vw, 80px);
+    }
+
+    .resenas-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .resenas-hd {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .resenas-hd .section-headline {
+      font-size: clamp(28px, 3.8vw, 48px);
+      margin-bottom: 18px;
+    }
+    .resenas-rating {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-mid);
+      font-weight: 400;
+    }
+    .resenas-stars {
+      color: var(--terracotta);
+      font-size: 20px;
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+    .resenas-rating strong {
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+
+    /* Cards grid */
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .review-card {
+      background: var(--white);
+      border: 1px solid #E8E0CC;
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: box-shadow .3s var(--ease), transform .3s var(--ease);
+    }
+    .review-card:hover {
+      box-shadow: 0 8px 32px rgba(0,0,0,.09);
+      transform: translateY(-2px);
+    }
+
+    /* Reviewer row */
+    .reviewer-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .reviewer-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      letter-spacing: .03em;
+    }
+    .reviewer-info { min-width: 0; }
+    .reviewer-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+    .local-guide-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--ocean);
+      background: rgba(42, 110, 138, .10);
+      padding: 2px 7px;
+      border-radius: 50px;
+      margin-top: 3px;
+    }
+
+    /* Stars */
+    .review-stars {
+      color: var(--terracotta);
+      font-size: 14px;
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+
+    /* Body text */
+    .review-text {
+      font-size: 14px;
+      line-height: 1.68;
+      color: var(--text-mid);
+      font-weight: 300;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Footer row */
+    .review-footer {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: auto;
+      padding-top: 4px;
+    }
+    .review-date {
+      font-size: 12px;
+      color: var(--text-light);
+      font-weight: 400;
+    }
+    .review-source {
+      font-size: 11px;
+      color: var(--text-light);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .review-source::before {
+      content: '·';
+      font-size: 14px;
+      line-height: 1;
+    }
+    /* Google "G" inline badge */
+    .google-g {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid #E8E0CC;
+      font-size: 9px;
+      font-weight: 700;
+      color: #4285F4;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    /* CTA below cards */
+    .reviews-cta {
+      text-align: center;
+    }
+    .reviews-cta p {
+      font-size: 15px;
+      color: var(--text-mid);
+      font-weight: 300;
+      margin-bottom: 16px;
+    }
+    .reviews-cta-btn {
+      display: inline-block;
+      padding: 13px 28px;
+      border: 1.5px solid var(--terracotta);
+      border-radius: 50px;
+      color: var(--terracotta);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      background: transparent;
+      cursor: pointer;
+      transition: background .22s, color .22s, transform .15s;
+      text-decoration: none;
+    }
+    .reviews-cta-btn:hover {
+      background: var(--terracotta);
+      color: #fff;
+    }
+    .reviews-cta-btn:active { transform: scale(.97); }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .reviews-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .reviews-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============================================================
+       NAVIGATION
+  ============================================================ -->
+  <nav class="nav" id="mainNav" role="navigation" aria-label="Navegación principal">
+    <a class="nav-logo" href="#inicio" aria-label="Inicio">
+      <img src="images/logo-atlantis.png" alt="Atlantis Charters" id="navLogo">
+    </a>
+
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#experiencia" data-section="experiencia">Experiencia</a></li>
+      <li><a href="#barco"       data-section="barco">El Barco</a></li>
+      <li><a href="places.html">Destinos</a></li>
+      <li><a href="#galeria"     data-section="galeria">Galería</a></li>
+      <li><a href="#reservar"    class="nav-cta">Reservar</a></li>
+    </ul>
+
+    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile overlay menu -->
+  <div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Menú móvil">
+    <a href="#experiencia" class="mob-link">Experiencia</a>
+    <a href="#barco"       class="mob-link">El Barco</a>
+    <a href="places.html"  class="mob-link">Destinos</a>
+    <a href="#galeria"     class="mob-link">Galería</a>
+    <a href="#reservar"    class="mob-link">Reservar</a>
+  </div>
+
+  <main>
+
+    <!-- ============================================================
+         HERO
+    ============================================================ -->
+    <section id="inicio" aria-label="Portada">
+      <video class="hero-video" autoplay muted loop playsinline poster="images/style.1.png">
+        <source src="images/Hero.video.mov" type="video/quicktime">
+        <source src="images/Hero.video.mov" type="video/mp4">
+      </video>
+      <div class="hero-overlay" aria-hidden="true"></div>
+
+      <div class="hero-content">
+        <p class="hero-tag">Mallorca &nbsp;·&nbsp; Mediterráneo</p>
+        <h1 class="hero-headline">Navega como en casa</h1>
+        <p class="hero-subtitle">Experiencias únicas a bordo de un llaut mallorquín tradicional</p>
+
+        <div class="booking-bar" role="search" aria-label="Consulta rápida">
+          <div class="bfield">
+            <label for="hFecha">Fecha de salida</label>
+            <input type="date" id="hFecha" name="fecha" aria-label="Fecha de salida">
+          </div>
+          <div class="bfield">
+            <label for="hPax">Pasajeros</label>
+            <select id="hPax" name="pasajeros" aria-label="Número de pasajeros">
+              <option value="">Seleccionar</option>
+              <option value="1">1 persona</option>
+              <option value="2">2 personas</option>
+              <option value="3">3 personas</option>
+              <option value="4">4 personas</option>
+              <option value="5">5 personas</option>
+              <option value="6">6 personas</option>
+              <option value="7">7 personas</option>
+              <option value="8">8 personas</option>
+              <option value="9">9 personas</option>
+              <option value="10">10 personas</option>
+              <option value="11">11 personas</option>
+              <option value="12">12 personas</option>
+            </select>
+          </div>
+          <div class="bfield">
+            <label for="hDur">Duración</label>
+            <select id="hDur" name="duracion" aria-label="Duración de la excursión">
+              <option value="">Seleccionar</option>
+              <option value="Medio día">Medio día</option>
+              <option value="Día completo">Día completo</option>
+              <option value="Atardecer">Atardecer</option>
+            </select>
+          </div>
+          <button class="booking-cta" id="bookingBarBtn" type="button">Consultar &nbsp;→</button>
+        </div>
+      </div>
+
+      <div class="scroll-cue" aria-hidden="true">
+        <span>Scroll</span>
+        <div class="scroll-line"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         EXPERIENCE
+    ============================================================ -->
+    <section id="experiencia" aria-labelledby="expHeading">
+      <div class="exp-grid">
+
+        <div class="exp-text">
+          <p class="section-tag reveal">La Experiencia</p>
+          <h2 class="section-headline reveal reveal-d1" id="expHeading">
+            Un día en el Mediterráneo<br>que no olvidarás
+          </h2>
+          <p class="reveal reveal-d2">
+            Zarpa desde las costas de Mallorca a bordo del Atlantis, un llaut mallorquín restaurado con esmero que combina la autenticidad de la tradición náutica con el confort más refinado. Descubre calas ocultas de aguas turquesas, fondea en rincones que solo se alcanzan por mar, y vive el Mediterráneo como lo han vivido siempre los mallorquines — con calma, sabor y gratitud.
+          </p>
+
+          <div class="highlights">
+            <div class="hl-item reveal reveal-d2">
+              <div class="hl-icon">⚓</div>
+              <div class="hl-text">
+                <strong>Todo incluido</strong>
+                <span>Combustible, tripulación, equipo de snorkel y seguridad</span>
+              </div>
+            </div>
+            <div class="hl-item reveal reveal-d3">
+              <div class="hl-icon">🐟</div>
+              <div class="hl-text">
+                <strong>Snorkel &amp; Spots secretos</strong>
+                <span>Calas vírgenes solo accesibles por barco, aguas cristalinas</span>
+              </div>
+            </div>
+            <div class="hl-item reveal reveal-d4">
+              <div class="hl-icon">🥂</div>
+              <div class="hl-text">
+                <strong>Bebidas y aperitivos</strong>
+                <span>Vino local, refrescos y picoteo mallorquín a bordo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="exp-image reveal reveal-d2">
+          <img src="images/style.1.png" alt="Experiencia Atlantis Charters — cala mediterránea desde el barco" loading="lazy">
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         BOAT
+    ============================================================ -->
+    <section id="barco" aria-labelledby="boatHeading">
+      <div class="boat-inner">
+
+        <div class="boat-header reveal">
+          <p class="section-tag">El Barco</p>
+          <h2 class="section-headline" id="boatHeading">Conoce al Atlantis</h2>
+          <p>Un llaut mallorquín de madera restaurado a mano, reflejo fiel de la identidad marinera de las Islas Baleares. El Atlantis combina la elegancia de lo artesanal con la solidez de décadas en el mar.</p>
+        </div>
+
+        <div class="specs-row reveal reveal-d1" role="list" aria-label="Especificaciones del barco">
+          <div class="spec" role="listitem">
+            <span class="spec-val">12 m</span>
+            <span class="spec-lbl">Eslora</span>
+          </div>
+          <div class="spec" role="listitem">
+            <span class="spec-val">12</span>
+            <span class="spec-lbl">Capacidad</span>
+          </div>
+          <div class="spec" role="listitem">
+            <span class="spec-val">Mixto</span>
+            <span class="spec-lbl">Vela + Auxiliar</span>
+          </div>
+        </div>
+
+        <div class="boat-img-wrap reveal reveal-d2">
+          <img src="images/style.2.png" alt="Llaut mallorquín Atlantis en el Mediterráneo" loading="lazy">
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         GALLERY
+    ============================================================ -->
+    <section id="galeria" aria-labelledby="galHeading">
+
+      <div class="gallery-hd reveal">
+        <p class="section-tag">Galería</p>
+        <h2 class="section-headline" id="galHeading">El verano en imágenes</h2>
+      </div>
+
+      <div class="gallery-grid" role="list" aria-label="Galería de fotografías">
+        <div class="gi reveal"          role="listitem"><img src="images/style.1.png" alt="Cala mediterránea" loading="lazy"></div>
+        <div class="gi reveal reveal-d1" role="listitem"><img src="images/style.2.png" alt="Llaut Atlantis" loading="lazy"></div>
+        <div class="gi reveal reveal-d2" role="listitem"><img src="images/style.3.png" alt="Bañada en el Mediterráneo" loading="lazy"></div>
+        <div class="gi reveal reveal-d1" role="listitem"><img src="images/style.4.png" alt="Atardecer en Mallorca" loading="lazy"></div>
+        <div class="gi reveal reveal-d2" role="listitem"><img src="images/style.3.png" alt="Aguas turquesas" loading="lazy"></div>
+        <div class="gi reveal reveal-d3" role="listitem"><img src="images/style.4.png" alt="Vida a bordo" loading="lazy"></div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================
+         REVIEWS
+    ============================================================ -->
+    <section id="resenas" aria-labelledby="resenasHeading">
+      <div class="resenas-inner">
+
+        <div class="resenas-hd reveal">
+          <p class="section-tag">Lo que dicen nuestros pasajeros</p>
+          <h2 class="section-headline" id="resenasHeading">Experiencias que hablan por sí solas</h2>
+          <div class="resenas-rating">
+            <span class="resenas-stars" aria-label="5 estrellas">★★★★★</span>
+            <span><strong>5.0</strong> · Basado en reseñas de Google</span>
+          </div>
+        </div>
+
+        <div class="reviews-grid">
+
+          <!-- 1 — Felicitas Mias -->
+          <article class="review-card reveal">
+            <div class="reviewer-row">
+              <div class="reviewer-avatar" style="background:#C8574A;" aria-hidden="true">FM</div>
+              <div class="reviewer-info">
+                <div class="reviewer-name">Felicitas Mias</div>
+              </div>
+            </div>
+            <div class="review-stars" aria-label="5 estrellas">★★★★★</div>
+            <p class="review-text">Es el mejor plan que se puede hacer en mallorca. Escaparse de las playas con multitudes y pasar un día tranquilo con los tuyos. Federico fue super amable y nos preparó típicas tapas españolas acompañado por cervezas locales también. Hicimos snorkel paddle surf y disfrutamos de un día maravilloso. Super recomendable !!!!</p>
+            <div class="review-footer">
+              <span class="review-date">Hace 10 meses</span>
+              <span class="review-source"><span class="google-g" aria-label="Google">G</span> Google</span>
+            </div>
+          </article>
+
+          <!-- 2 — Marina Graciela Courcelles -->
+          <article class="review-card reveal reveal-d1">
+            <div class="reviewer-row">
+              <div class="reviewer-avatar" style="background:#2A6E8A;" aria-hidden="true">MC</div>
+              <div class="reviewer-info">
+                <div class="reviewer-name">Marina Graciela Courcelles</div>
+                <span class="local-guide-badge">Local Guide</span>
+              </div>
+            </div>
+            <div class="review-stars" aria-label="5 estrellas">★★★★★</div>
+            <p class="review-text">Una experiencia maravillosa desde que salimos hasta el regreso todo fué mágico! La atención de Felicitas y Federico que están super pendientes de cada detalle para que sea realmente un viaje inolvidable. Lo recomiendo para quienes quieren desconectarse y disfrutar.</p>
+            <div class="review-footer">
+              <span class="review-date">Hace 9 meses</span>
+              <span class="review-source"><span class="google-g" aria-label="Google">G</span> Google</span>
+            </div>
+          </article>
+
+          <!-- 3 — Luciano Cassoni -->
+          <article class="review-card reveal reveal-d2">
+            <div class="reviewer-row">
+              <div class="reviewer-avatar" style="background:#C49A3C;" aria-hidden="true">LC</div>
+              <div class="reviewer-info">
+                <div class="reviewer-name">Luciano Cassoni</div>
+              </div>
+            </div>
+            <div class="review-stars" aria-label="5 estrellas">★★★★★</div>
+            <p class="review-text">El mejor plan para pasarla súper bien entre amigos o familia! La barca tradicional del mediterráneo es increíble, muy segura y con mucho estilo y cariño de sus dueños, quienes te hacen sentir como en casa desde el primer momento.</p>
+            <div class="review-footer">
+              <span class="review-date">Hace 8 meses</span>
+              <span class="review-source"><span class="google-g" aria-label="Google">G</span> Google</span>
+            </div>
+          </article>
+
+          <!-- 4 — Belen Pellejero -->
+          <article class="review-card reveal">
+            <div class="reviewer-row">
+              <div class="reviewer-avatar" style="background:#C8574A;" aria-hidden="true">BP</div>
+              <div class="reviewer-info">
+                <div class="reviewer-name">Belen Pellejero</div>
+                <span class="local-guide-badge">Local Guide</span>
+              </div>
+            </div>
+            <div class="review-stars" aria-label="5 estrellas">★★★★★</div>
+            <p class="review-text">Increíble experiencia para disfrutar con amigos y familia. Recorrimos lugares hermosos y pasamos un día inmejorable. Fede nos hizo sentir como si lo conociéramos desde siempre y nos brindó todo lo necesario para un día perfecto.</p>
+            <div class="review-footer">
+              <span class="review-date">Hace 6 meses</span>
+              <span class="review-source"><span class="google-g" aria-label="Google">G</span> Google</span>
+            </div>
+          </article>
+
+          <!-- 5 — Gonzalo Garcia -->
+          <article class="review-card reveal reveal-d1">
+            <div class="reviewer-row">
+              <div class="reviewer-avatar" style="background:#2A6E8A;" aria-hidden="true">GG</div>
+              <div class="reviewer-info">
+                <div class="reviewer-name">Gonzalo Garcia</div>
+              </div>
+            </div>
+            <div class="review-stars" aria-label="5 estrellas">★★★★★</div>
+            <p class="review-text">Una experiencia inolvidable, recorrimos rincones hermosos de esta isla. Altamente recomendable, repetiria sin duda.</p>
+            <div class="review-footer">
+              <span class="review-date">Hace 7 meses</span>
+              <span class="review-source"><span class="google-g" aria-label="Google">G</span> Google</span>
+            </div>
+          </article>
+
+          <!-- 6 — Josefina Damonte -->
+          <article class="review-card reveal reveal-d2">
+            <div class="reviewer-row">
+              <div class="reviewer-avatar" style="background:#C49A3C;" aria-hidden="true">JD</div>
+              <div class="reviewer-info">
+                <div class="reviewer-name">Josefina Damonte</div>
+              </div>
+            </div>
+            <div class="review-stars" aria-label="5 estrellas">★★★★★</div>
+            <p class="review-text">Excelente experiencia para recorrer y conocer la isla. Muy amable el staff y la comida riquísima. Recomiendo!!!</p>
+            <div class="review-footer">
+              <span class="review-date">Hace 7 meses</span>
+              <span class="review-source"><span class="google-g" aria-label="Google">G</span> Google</span>
+            </div>
+          </article>
+
+        </div><!-- /.reviews-grid -->
+
+        <div class="reviews-cta reveal">
+          <p>¿Has navegado con nosotros? Comparte tu experiencia</p>
+          <a class="reviews-cta-btn"
+             href="https://www.tripadvisor.es/UserReviewEdit-g1028722-d28010616-Atlantis_Experience-Port_de_Pollenca_Majorca_Balearic_Islands.html"
+             target="_blank"
+             rel="noopener noreferrer">
+            Dejar una reseña en TripAdvisor ↗
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         BOOKING / CONTACT
+    ============================================================ -->
+    <section id="reservar" aria-labelledby="resHeading">
+      <div class="res-inner">
+
+        <p class="section-tag reveal">Reservas</p>
+        <h2 class="section-headline reveal reveal-d1" id="resHeading">¿Listo para zarpar?</h2>
+        <p class="res-sub reveal reveal-d2">
+          Escríbenos para comprobar disponibilidad.<br>
+          Confirmamos en menos de 24&nbsp;h.
+        </p>
+
+        <form class="cform reveal reveal-d2" id="contactForm" novalidate>
+          <div class="frow">
+            <div class="ffield">
+              <label for="cNombre">Nombre</label>
+              <input type="text"  id="cNombre" name="nombre"   placeholder="Tu nombre"        required>
+            </div>
+            <div class="ffield">
+              <label for="cEmail">Email</label>
+              <input type="email" id="cEmail"  name="email"    placeholder="tu@email.com"     required>
+            </div>
+          </div>
+          <div class="frow">
+            <div class="ffield">
+              <label for="cTel">Teléfono</label>
+              <input type="tel"  id="cTel"   name="telefono" placeholder="+34 600 000 000">
+            </div>
+            <div class="ffield">
+              <label for="cFecha">Fecha deseada</label>
+              <input type="date" id="cFecha"  name="fecha">
+            </div>
+          </div>
+          <div class="ffield">
+            <label for="cMsg">Mensaje</label>
+            <textarea id="cMsg" name="mensaje"
+              placeholder="Cuéntanos qué buscas — número de personas, duración, ocasión especial..."></textarea>
+          </div>
+          <button type="submit" class="submit-btn">Enviar consulta</button>
+        </form>
+
+        <div class="form-success" id="formSuccess" role="alert" aria-live="polite">
+          <h3>¡Mensaje recibido! 🌊</h3>
+          <p>Nos pondremos en contacto contigo en menos de 24 horas. ¡Hasta pronto a bordo del Atlantis!</p>
+        </div>
+
+        <div class="contact-strip reveal">
+          <div class="ci">
+            <span aria-hidden="true">📞</span>
+            <a href="tel:+34611062419">+34 611 062 419</a>
+          </div>
+          <div class="ci">
+            <span aria-hidden="true">✉</span>
+            <a href="mailto:Atlantis.charter.mallorca@gmail.com">Atlantis.charter.mallorca@gmail.com</a>
+          </div>
+          <div class="ci">
+            <span aria-hidden="true">📸</span>
+            <a href="https://instagram.com/atlantis.charters" target="_blank" rel="noopener noreferrer">@atlantis.charters</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer>
+    <div class="foot-inner">
+      <a class="foot-logo" href="#inicio" aria-label="Atlantis Charters — volver al inicio">
+        <img src="images/logo-atlantis.png" alt="Atlantis Charters">
+      </a>
+      <ul class="foot-links">
+        <li><a href="#experiencia">Experiencia</a></li>
+        <li><a href="#barco">El Barco</a></li>
+        <li><a href="#galeria">Galería</a></li>
+        <li><a href="#reservar">Reservar</a></li>
+      </ul>
+      <p class="foot-copy">© 2025 Atlantis Charters&nbsp;·&nbsp;Mallorca</p>
+    </div>
+  </footer>
+
+
+  <!-- ============================================================
+       JAVASCRIPT
+  ============================================================ -->
+  <script>
+    /* ---- Nav scroll state ---- */
+    const nav = document.getElementById('mainNav');
+    let ticking = false;
+
+    function updateNav() {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) { requestAnimationFrame(updateNav); ticking = true; }
+    }, { passive: true });
+
+    /* ---- Hamburger / mobile menu ---- */
+    const burger     = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    function toggleMenu(open) {
+      burger.classList.toggle('open', open);
+      mobileMenu.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', String(open));
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
+
+    burger.addEventListener('click', () => toggleMenu(!burger.classList.contains('open')));
+
+    document.querySelectorAll('.mob-link').forEach(a => {
+      a.addEventListener('click', () => toggleMenu(false));
+    });
+
+    /* ---- Scroll-reveal ---- */
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12, rootMargin: '0px 0px -36px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    /* ---- Active nav link on scroll ---- */
+    const sections   = document.querySelectorAll('section[id]');
+    const navLinks   = document.querySelectorAll('.nav-links a[data-section]');
+
+    const sectionObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const id = e.target.getAttribute('id');
+          navLinks.forEach(a => a.classList.toggle('active', a.dataset.section === id));
+        }
+      });
+    }, { threshold: 0.45 });
+
+    sections.forEach(s => sectionObs.observe(s));
+
+    /* ---- Booking bar CTA → scroll to #reservar + pre-fill ---- */
+    document.getElementById('bookingBarBtn').addEventListener('click', () => {
+      document.getElementById('reservar').scrollIntoView({ behavior: 'smooth' });
+
+      // Pre-fill date
+      const heroDt = document.getElementById('hFecha').value;
+      if (heroDt) document.getElementById('cFecha').value = heroDt;
+
+      // Pre-fill message with selection
+      const pax = document.getElementById('hPax');
+      const dur = document.getElementById('hDur');
+      const msgEl = document.getElementById('cMsg');
+      if (!msgEl.value) {
+        const parts = [];
+        if (pax.value) parts.push(pax.options[pax.selectedIndex].text);
+        if (dur.value) parts.push(dur.value);
+        if (parts.length) msgEl.value = `Me interesa una excursión para ${parts.join(', ')}.`;
+      }
+    });
+
+    /* ---- Contact form submit ---- */
+    document.getElementById('contactForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      this.style.display = 'none';
+      document.getElementById('formSuccess').classList.add('show');
+    });
+  </script>
+
+</body>
+</html>
