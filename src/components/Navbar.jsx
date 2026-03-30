@@ -3,11 +3,52 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '../contexts/LanguageContext'
 
+/* ── SVG Flag components ── */
+function FlagES() {
+  return (
+    <svg viewBox="0 0 30 20" width="30" height="20" xmlns="http://www.w3.org/2000/svg" style={{display:'block',borderRadius:'3px'}}>
+      <rect width="30" height="20" fill="#c60b1e"/>
+      <rect y="5" width="30" height="10" fill="#ffc400"/>
+    </svg>
+  )
+}
+function FlagGB() {
+  return (
+    <svg viewBox="0 0 60 30" width="30" height="20" xmlns="http://www.w3.org/2000/svg" style={{display:'block',borderRadius:'3px'}}>
+      <rect width="60" height="30" fill="#012169"/>
+      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6"/>
+      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" strokeWidth="4"/>
+      <path d="M30,0 V30 M0,15 H60" stroke="#fff" strokeWidth="10"/>
+      <path d="M30,0 V30 M0,15 H60" stroke="#C8102E" strokeWidth="6"/>
+    </svg>
+  )
+}
+function FlagDE() {
+  return (
+    <svg viewBox="0 0 30 20" width="30" height="20" xmlns="http://www.w3.org/2000/svg" style={{display:'block',borderRadius:'3px'}}>
+      <rect width="30" height="20" fill="#000"/>
+      <rect y="6.67" width="30" height="6.67" fill="#D00"/>
+      <rect y="13.34" width="30" height="6.66" fill="#FFCE00"/>
+    </svg>
+  )
+}
+function FlagFR() {
+  return (
+    <svg viewBox="0 0 30 20" width="30" height="20" xmlns="http://www.w3.org/2000/svg" style={{display:'block',borderRadius:'3px'}}>
+      <rect width="30" height="20" fill="#ED2939"/>
+      <rect width="20" height="20" fill="#fff"/>
+      <rect width="10" height="20" fill="#002395"/>
+    </svg>
+  )
+}
+
+const FLAG_MAP = { es: <FlagES/>, en: <FlagGB/>, de: <FlagDE/>, fr: <FlagFR/> }
+
 const LANG_OPTIONS = [
-  { code: 'es', flag: '🇪🇸', label: 'ES' },
-  { code: 'en', flag: '🇬🇧', label: 'EN' },
-  { code: 'de', flag: '🇩🇪', label: 'DE' },
-  { code: 'fr', flag: '🇫🇷', label: 'FR' },
+  { code: 'es', label: 'Español' },
+  { code: 'en', label: 'English' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'fr', label: 'Français' },
 ]
 
 function LangSelector() {
@@ -15,14 +56,11 @@ function LangSelector() {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
-  // Close on outside click
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
-
-  const current = LANG_OPTIONS.find(l => l.code === lang) || LANG_OPTIONS[0]
 
   return (
     <div className="lang-selector" ref={ref}>
@@ -31,12 +69,11 @@ function LangSelector() {
         onClick={() => setOpen(v => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label="Seleccionar idioma"
+        aria-label="Select language"
       >
-        <span className="lang-flag">{current.flag}</span>
-        <span className="lang-code">{current.label}</span>
-        <svg className={`lang-chevron${open ? ' open' : ''}`} width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-          <path d="M1 3l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        {FLAG_MAP[lang] || <FlagES/>}
+        <svg className={`lang-chevron${open ? ' open' : ''}`} width="8" height="8" viewBox="0 0 10 10" fill="none">
+          <path d="M1 3l4 4 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>
 
@@ -55,9 +92,9 @@ function LangSelector() {
                 <button
                   className={`lang-option${opt.code === lang ? ' active' : ''}`}
                   onClick={() => { changeLang(opt.code); setOpen(false) }}
+                  aria-label={opt.label}
                 >
-                  <span className="lang-flag">{opt.flag}</span>
-                  <span>{opt.label}</span>
+                  {FLAG_MAP[opt.code]}
                 </button>
               </li>
             ))}
