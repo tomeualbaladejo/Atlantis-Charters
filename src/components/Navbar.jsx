@@ -1,15 +1,75 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLanguage } from '../contexts/LanguageContext'
 
-const NAV_ITEMS = [
-  { label: 'Inicio',      path: '/' },
-  { label: 'Experiencia', path: '/experiencia' },
-  { label: 'Destinos',    path: '/destinos' },
-  { label: 'Nosotros',    path: '/nosotros' },
+const LANG_OPTIONS = [
+  { code: 'es', flag: '🇪🇸', label: 'ES' },
+  { code: 'en', flag: '🇬🇧', label: 'EN' },
+  { code: 'de', flag: '🇩🇪', label: 'DE' },
+  { code: 'fr', flag: '🇫🇷', label: 'FR' },
 ]
 
+function LangSelector() {
+  const { lang, changeLang } = useLanguage()
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const current = LANG_OPTIONS.find(l => l.code === lang) || LANG_OPTIONS[0]
+
+  return (
+    <div className="lang-selector" ref={ref}>
+      <button
+        className="lang-current"
+        onClick={() => setOpen(v => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label="Seleccionar idioma"
+      >
+        <span className="lang-flag">{current.flag}</span>
+        <span className="lang-code">{current.label}</span>
+        <svg className={`lang-chevron${open ? ' open' : ''}`} width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+          <path d="M1 3l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            className="lang-dropdown"
+            role="listbox"
+            initial={{ opacity: 0, y: -6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+          >
+            {LANG_OPTIONS.map(opt => (
+              <li key={opt.code} role="option" aria-selected={opt.code === lang}>
+                <button
+                  className={`lang-option${opt.code === lang ? ' active' : ''}`}
+                  onClick={() => { changeLang(opt.code); setOpen(false) }}
+                >
+                  <span className="lang-flag">{opt.flag}</span>
+                  <span>{opt.label}</span>
+                </button>
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
 export default function Navbar() {
+  const { t } = useLanguage()
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
@@ -32,6 +92,13 @@ export default function Navbar() {
   const isActive = (path) =>
     path === '/' ? location.pathname === '/' : location.pathname === path
 
+  const NAV_ITEMS = [
+    { labelKey: 'nav.inicio',      path: '/' },
+    { labelKey: 'nav.experiencia', path: '/experiencia' },
+    { labelKey: 'nav.destinos',    path: '/destinos' },
+    { labelKey: 'nav.nosotros',    path: '/nosotros' },
+  ]
+
   return (
     <>
       <nav className="navbar" role="navigation" aria-label="Navegación principal">
@@ -41,19 +108,20 @@ export default function Navbar() {
 
         <ul className="navbar-links">
           {NAV_ITEMS.map(item => (
-            <li key={item.label}>
+            <li key={item.labelKey}>
               <Link
                 to={item.path}
                 className={isActive(item.path) ? 'active' : ''}
                 aria-current={isActive(item.path) ? 'page' : undefined}
               >
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             </li>
           ))}
+          <li><LangSelector /></li>
           <li>
             <button className="navbar-cta" onClick={goReservar}>
-              Reservar
+              {t('nav.reservar')}
             </button>
           </li>
         </ul>
@@ -79,7 +147,7 @@ export default function Navbar() {
           >
             {NAV_ITEMS.map((item, i) => (
               <motion.div
-                key={item.label}
+                key={item.labelKey}
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.07 }}
@@ -89,18 +157,26 @@ export default function Navbar() {
                   onClick={() => setMenuOpen(false)}
                   className={isActive(item.path) ? 'terra' : ''}
                 >
-                  {item.label}
+                  {t(item.labelKey)}
                 </Link>
               </motion.div>
             ))}
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: NAV_ITEMS.length * 0.07 }}
+              style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}
+            >
+              <LangSelector />
+            </motion.div>
             <motion.button
               className="terra"
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: NAV_ITEMS.length * 0.07 }}
+              transition={{ delay: (NAV_ITEMS.length + 1) * 0.07 }}
               onClick={goReservar}
             >
-              Reservar
+              {t('nav.reservar')}
             </motion.button>
           </motion.div>
         )}

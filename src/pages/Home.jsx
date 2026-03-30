@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { useLanguage } from '../contexts/LanguageContext'
+import { MONTH_NAMES_BY_LANG, DAY_LABELS_BY_LANG, formatDate } from '../i18n/translations'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -18,19 +20,8 @@ const inView = { once: true, margin: '-80px' }
 const CALENDAR_ID = '5a5db2572ebedac3b8a4ff1b20be073b8c401613be54e5696392b080f17cd66a@group.calendar.google.com'
 const API_KEY     = 'AIzaSyCHwWh-VLu5G5zpB8-GsaVd7bHNnJzi1Vw'
 
-const MONTH_NAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
-                     'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-const DAY_LABELS  = ['L','M','X','J','V','S','D']
-
 function toYMD(date) {
   return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`
-}
-
-function formatDateES(ymd) {
-  const [y, m, d] = ymd.split('-').map(Number)
-  const date = new Date(y, m - 1, d)
-  const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']
-  return `${days[date.getDay()]}, ${d} de ${MONTH_NAMES[m-1]} de ${y}`
 }
 
 /* ── Review data ── */
@@ -75,9 +66,13 @@ const REVIEWS = [
 
 /* ── Availability Modal ── */
 function AvailabilityModal({ isOpen, onClose, initialPax, initialDuration }) {
-  const today      = new Date()
+  const { t, lang } = useLanguage()
+  const MONTH_NAMES = MONTH_NAMES_BY_LANG[lang] || MONTH_NAMES_BY_LANG.es
+  const DAY_LABELS  = DAY_LABELS_BY_LANG[lang]  || DAY_LABELS_BY_LANG.es
+
+  const today    = new Date()
   today.setHours(0, 0, 0, 0)
-  const todayYMD   = toYMD(today)
+  const todayYMD = toYMD(today)
 
   const [viewYear,    setViewYear]    = useState(today.getFullYear())
   const [viewMonth,   setViewMonth]   = useState(today.getMonth())
@@ -85,13 +80,11 @@ function AvailabilityModal({ isOpen, onClose, initialPax, initialDuration }) {
   const [loading,     setLoading]     = useState(false)
   const [selectedDate, setSelectedDate] = useState(null)
 
-  // Selects live inside the modal
   const [modalPax,      setModalPax]      = useState('')
   const [modalDuration, setModalDuration] = useState('')
   const [paxError,      setPaxError]      = useState(false)
   const [durError,      setDurError]      = useState(false)
 
-  // Pre-fill from booking bar values when modal opens
   useEffect(() => {
     if (isOpen) {
       setModalPax(initialPax || '')
@@ -195,11 +188,11 @@ function AvailabilityModal({ isOpen, onClose, initialPax, initialDuration }) {
     setDurError(noDur)
     if (noPax || noDur) return
     const msg = [
-      'Hola! Me gustaría reservar una salida en el Atlantis.',
-      `Fecha: ${formatDateES(selectedDate)}`,
-      `Pasajeros: ${modalPax}`,
-      `Duración: ${modalDuration}`,
-      '¡Muchas gracias!',
+      t('modal.wa.greeting'),
+      `${t('modal.wa.date')} ${formatDate(selectedDate, lang)}`,
+      `${t('modal.wa.pax')} ${modalPax}`,
+      `${t('modal.wa.dur')} ${modalDuration}`,
+      t('modal.wa.thanks'),
     ].join('\n')
     window.open(`https://wa.me/34611062419?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer')
   }
@@ -226,55 +219,55 @@ function AvailabilityModal({ isOpen, onClose, initialPax, initialDuration }) {
             {/* Header */}
             <div className="avail-header">
               <div>
-                <div className="avail-title">Consultar disponibilidad</div>
-                <div className="avail-subtitle">Selecciona una fecha disponible para tu salida</div>
+                <div className="avail-title">{t('modal.title')}</div>
+                <div className="avail-subtitle">{t('modal.subtitle')}</div>
               </div>
-              <button className="avail-close" onClick={onClose} aria-label="Cerrar">×</button>
+              <button className="avail-close" onClick={onClose} aria-label={t('modal.close')}>×</button>
             </div>
 
-            {/* Selects — always visible inside modal */}
+            {/* Selects */}
             <div className="avail-selects">
               <div className="avail-select-field">
-                <label className="avail-select-label" htmlFor="modalPax">Pasajeros</label>
+                <label className="avail-select-label" htmlFor="modalPax">{t('modal.pax.label')}</label>
                 <select
                   id="modalPax"
                   className={`avail-select${paxError ? ' avail-select--error' : ''}`}
                   value={modalPax}
                   onChange={e => { setModalPax(e.target.value); setPaxError(false) }}
                 >
-                  <option value="">Seleccionar</option>
+                  <option value="">{t('modal.pax.select')}</option>
                   {[...Array(12)].map((_, i) => (
-                    <option key={i+1} value={`${i+1} ${i === 0 ? 'persona' : 'personas'}`}>
-                      {i+1} {i === 0 ? 'persona' : 'personas'}
+                    <option key={i+1} value={`${i+1} ${i === 0 ? t('modal.pax.person') : t('modal.pax.plural')}`}>
+                      {i+1} {i === 0 ? t('modal.pax.person') : t('modal.pax.plural')}
                     </option>
                   ))}
                 </select>
-                {paxError && <span className="avail-select-error">Por favor selecciona el número de pasajeros</span>}
+                {paxError && <span className="avail-select-error">{t('modal.pax.error')}</span>}
               </div>
               <div className="avail-select-field">
-                <label className="avail-select-label" htmlFor="modalDur">Duración</label>
+                <label className="avail-select-label" htmlFor="modalDur">{t('modal.dur.label')}</label>
                 <select
                   id="modalDur"
                   className={`avail-select${durError ? ' avail-select--error' : ''}`}
                   value={modalDuration}
                   onChange={e => { setModalDuration(e.target.value); setDurError(false) }}
                 >
-                  <option value="">Seleccionar</option>
-                  <option value="Medio día (mañana)">Medio día (mañana)</option>
-                  <option value="Medio día (tarde)">Medio día (tarde)</option>
-                  <option value="Día completo">Día completo</option>
-                  <option value="Atardecer">Atardecer</option>
+                  <option value="">{t('modal.dur.select')}</option>
+                  <option value={t('modal.dur.morning')}>{t('modal.dur.morning')}</option>
+                  <option value={t('modal.dur.afternoon')}>{t('modal.dur.afternoon')}</option>
+                  <option value={t('modal.dur.full')}>{t('modal.dur.full')}</option>
+                  <option value={t('modal.dur.sunset')}>{t('modal.dur.sunset')}</option>
                 </select>
-                {durError && <span className="avail-select-error">Por favor selecciona la duración</span>}
+                {durError && <span className="avail-select-error">{t('modal.dur.error')}</span>}
               </div>
             </div>
 
             {/* Calendar */}
             <div className="avail-body">
               <div className="avail-month-nav">
-                <button className="avail-arrow" onClick={goToPrevMonth} disabled={isAtMinMonth} aria-label="Mes anterior">←</button>
+                <button className="avail-arrow" onClick={goToPrevMonth} disabled={isAtMinMonth} aria-label={t('modal.prev')}>←</button>
                 <span className="avail-month-label">{MONTH_NAMES[viewMonth]} {viewYear}</span>
-                <button className="avail-arrow" onClick={goToNextMonth} disabled={isAtMaxMonth} aria-label="Mes siguiente">→</button>
+                <button className="avail-arrow" onClick={goToNextMonth} disabled={isAtMaxMonth} aria-label={t('modal.next')}>→</button>
               </div>
 
               <div className="avail-day-labels">
@@ -284,7 +277,7 @@ function AvailabilityModal({ isOpen, onClose, initialPax, initialDuration }) {
               {loading ? (
                 <div className="avail-loading">
                   <div className="avail-spinner" />
-                  <span>Comprobando disponibilidad...</span>
+                  <span>{t('modal.loading')}</span>
                 </div>
               ) : (
                 <div className="avail-grid">
@@ -303,7 +296,7 @@ function AvailabilityModal({ isOpen, onClose, initialPax, initialDuration }) {
                         ].join(' ').trim()}
                         onClick={() => handleDayClick(cell)}
                         disabled={cell.isPast || cell.isBooked}
-                        aria-label={`${cell.d} de ${MONTH_NAMES[viewMonth]}${cell.isBooked ? ' — reservado' : ''}`}
+                        aria-label={`${cell.d} ${MONTH_NAMES[viewMonth]}${cell.isBooked ? ` — ${t('modal.legend.booked')}` : ''}`}
                         aria-pressed={cell.isSelected}
                       >
                         {cell.d}
@@ -314,24 +307,24 @@ function AvailabilityModal({ isOpen, onClose, initialPax, initialDuration }) {
               )}
 
               <div className="avail-legend">
-                <span className="legend-item"><span className="legend-dot legend-dot--available" />Disponible</span>
-                <span className="legend-item"><span className="legend-dot legend-dot--booked" />Reservado</span>
-                <span className="legend-item"><span className="legend-dot legend-dot--selected" />Seleccionado</span>
+                <span className="legend-item"><span className="legend-dot legend-dot--available" />{t('modal.legend.available')}</span>
+                <span className="legend-item"><span className="legend-dot legend-dot--booked" />{t('modal.legend.booked')}</span>
+                <span className="legend-item"><span className="legend-dot legend-dot--selected" />{t('modal.legend.selected')}</span>
               </div>
             </div>
 
-            {/* Summary + WhatsApp — only after date selected */}
+            {/* Summary + WhatsApp */}
             {selectedDate && (
               <div className="avail-summary">
                 <div className="avail-summary-rows">
                   <div className="avail-summary-row">
-                    <span><strong>Fecha:</strong> {formatDateES(selectedDate)}</span>
+                    <span><strong>{t('modal.summary.date')}</strong> {formatDate(selectedDate, lang)}</span>
                   </div>
                 </div>
                 <button className="avail-whatsapp-btn" onClick={handleWhatsApp}>
-                  Confirmar por WhatsApp →
+                  {t('modal.wa.btn')}
                 </button>
-                <p className="avail-whatsapp-note">Te confirmaremos la reserva en menos de 24h</p>
+                <p className="avail-whatsapp-note">{t('modal.wa.note')}</p>
               </div>
             )}
           </motion.div>
@@ -343,12 +336,12 @@ function AvailabilityModal({ isOpen, onClose, initialPax, initialDuration }) {
 
 /* ── Home page ── */
 export default function Home() {
+  const { t } = useLanguage()
   const location    = useLocation()
   const reservarRef = useRef(null)
 
   const [pax,      setPax]      = useState('')
   const [duration, setDuration] = useState('')
-
   const [availOpen, setAvailOpen] = useState(false)
 
   useEffect(() => {
@@ -395,7 +388,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
           >
-            Mallorca&nbsp;·&nbsp;Mediterráneo
+            {t('hero.tag')}
           </motion.p>
 
           <motion.h1
@@ -404,7 +397,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.35 }}
           >
-            Navega como en casa
+            {t('hero.h1')}
           </motion.h1>
 
           <motion.p
@@ -413,7 +406,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.55 }}
           >
-            Experiencias únicas a bordo de un llaut mallorquín tradicional
+            {t('hero.sub')}
           </motion.p>
 
           <motion.div
@@ -425,27 +418,27 @@ export default function Home() {
             transition={{ duration: 1, delay: 0.75 }}
           >
             <div className="bfield">
-              <label htmlFor="hPax">Pasajeros</label>
-              <select id="hPax" value={pax} onChange={e => setPax(e.target.value)} aria-label="Número de pasajeros">
-                <option value="">Seleccionar</option>
+              <label htmlFor="hPax">{t('book.pax')}</label>
+              <select id="hPax" value={pax} onChange={e => setPax(e.target.value)}>
+                <option value="">{t('book.select')}</option>
                 {[...Array(12)].map((_, i) => (
-                  <option key={i + 1} value={String(i + 1)}>
-                    {i + 1} {i === 0 ? 'persona' : 'personas'}
+                  <option key={i+1} value={String(i+1)}>
+                    {i+1} {i === 0 ? t('book.pax.person') : t('book.pax.plural')}
                   </option>
                 ))}
               </select>
             </div>
             <div className="bfield">
-              <label htmlFor="hDur">Duración</label>
-              <select id="hDur" value={duration} onChange={e => setDuration(e.target.value)} aria-label="Duración">
-                <option value="">Seleccionar</option>
-                <option>Medio día</option>
-                <option>Día completo</option>
-                <option>Atardecer</option>
+              <label htmlFor="hDur">{t('book.dur')}</label>
+              <select id="hDur" value={duration} onChange={e => setDuration(e.target.value)}>
+                <option value="">{t('book.select')}</option>
+                <option>{t('book.dur.half')}</option>
+                <option>{t('book.dur.full')}</option>
+                <option>{t('book.dur.sunset')}</option>
               </select>
             </div>
             <button className="booking-cta-btn" onClick={() => setAvailOpen(true)} type="button">
-              Consultar&nbsp;→
+              {t('book.cta')}
             </button>
           </motion.div>
         </div>
@@ -473,13 +466,13 @@ export default function Home() {
             viewport={inView}
             transition={{ duration: 0.7 }}
           >
-            <p className="section-tag">Lo que dicen nuestros pasajeros</p>
+            <p className="section-tag">{t('reviews.tag')}</p>
             <h2 className="section-headline" id="resenasHeading">
-              Experiencias que hablan por sí solas
+              {t('reviews.h2')}
             </h2>
             <div className="reviews-rating">
               <span className="reviews-stars" aria-label="5 estrellas">★★★★★</span>
-              <span><strong>5.0</strong> · Basado en reseñas de Google</span>
+              <span><strong>5.0</strong> · {t('reviews.rating')}</span>
             </div>
           </motion.div>
 
@@ -493,11 +486,7 @@ export default function Home() {
             {REVIEWS.map((r, i) => (
               <motion.article key={i} className="review-card" variants={fadeUp}>
                 <div className="reviewer-row">
-                  <div
-                    className="reviewer-avatar"
-                    style={{ background: r.color }}
-                    aria-hidden="true"
-                  >
+                  <div className="reviewer-avatar" style={{ background: r.color }} aria-hidden="true">
                     {r.initials}
                   </div>
                   <div>
@@ -524,14 +513,14 @@ export default function Home() {
             viewport={inView}
             transition={{ duration: 0.7 }}
           >
-            <p>¿Has navegado con nosotros? Comparte tu experiencia</p>
+            <p>{t('reviews.cta.text')}</p>
             <a
               className="reviews-cta-btn"
               href="https://www.tripadvisor.es/UserReviewEdit-g1028722-d28010616-Atlantis_Experience-Port_de_Pollenca_Majorca_Balearic_Islands.html"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Dejar una reseña en TripAdvisor ↗
+              {t('reviews.cta.btn')}
             </a>
           </motion.div>
 
@@ -547,19 +536,17 @@ export default function Home() {
           whileInView="show"
           viewport={inView}
         >
-          {/* Section header — stays centered above grid */}
           <motion.h2 className="section-headline" id="resHeading" variants={fadeUp}>
-            ¿Listo para zarpar?
+            {t('contact.h2')}
           </motion.h2>
 
-          {/* Two-column grid */}
           <motion.div className="contact-grid" variants={fadeUp}>
 
             {/* LEFT — Map */}
             <div className="contact-map-col">
-              <p className="map-label">Dónde salimos</p>
-              <h3 className="map-title">Puerto de Pollença, Mallorca</h3>
-              <p className="map-desc">Muelle de Puerto de Pollença · Salidas cada mañana</p>
+              <p className="map-label">{t('contact.map.label')}</p>
+              <h3 className="map-title">{t('contact.map.title')}</h3>
+              <p className="map-desc">{t('contact.map.desc')}</p>
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12234.5!2d3.0856!3d39.9017!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1297e6196a5c6f79%3A0x9b0a28d40d1f4b8a!2sPuerto%20de%20Pollensa%2C%20Mallorca!5e0!3m2!1ses!2ses!4v1"
                 width="100%"
@@ -571,17 +558,17 @@ export default function Home() {
                 title="Puerto de Pollença, Mallorca"
               />
               <div className="map-pills">
-                <span className="map-pill">Salidas desde el puerto</span>
-                <span className="map-pill">Mañanas y tardes</span>
+                <span className="map-pill">{t('contact.pill.1')}</span>
+                <span className="map-pill">{t('contact.pill.2')}</span>
                 <span className="map-pill">+34 611 062 419</span>
               </div>
             </div>
 
             {/* RIGHT — Contact block */}
             <div className="contact-form-col">
-              <p className="map-label">Contacto directo</p>
-              <h3 className="map-title">Estamos aquí para ayudarte</h3>
-              <p className="map-desc">Escríbenos por cualquiera de estos canales y te respondemos en menos de 24h.</p>
+              <p className="map-label">{t('contact.right.label')}</p>
+              <h3 className="map-title">{t('contact.right.title')}</h3>
+              <p className="map-desc">{t('contact.right.desc')}</p>
 
               <div className="contact-buttons">
                 <a className="contact-btn contact-btn--whatsapp" href="https://wa.me/34611062419" target="_blank" rel="noopener noreferrer">
@@ -589,7 +576,7 @@ export default function Home() {
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.556 4.121 1.528 5.856L0 24l6.335-1.51A11.955 11.955 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.006-1.374l-.36-.214-3.727.888.929-3.635-.235-.374A9.818 9.818 0 1 1 12 21.818z"/></svg>
                   </span>
                   <span className="contact-btn-text">
-                    <span className="contact-btn-sub">Respuesta inmediata</span>
+                    <span className="contact-btn-sub">{t('contact.wa.sub')}</span>
                     <span className="contact-btn-main">+34 611 062 419</span>
                   </span>
                 </a>
@@ -598,7 +585,7 @@ export default function Home() {
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                   </span>
                   <span className="contact-btn-text">
-                    <span className="contact-btn-sub">Para consultas detalladas</span>
+                    <span className="contact-btn-sub">{t('contact.email.sub')}</span>
                     <span className="contact-btn-main">Atlantis.charter.mallorca@gmail.com</span>
                   </span>
                 </a>
@@ -607,13 +594,13 @@ export default function Home() {
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
                   </span>
                   <span className="contact-btn-text">
-                    <span className="contact-btn-sub">Síguenos para ver nuestras salidas</span>
+                    <span className="contact-btn-sub">{t('contact.ig.sub')}</span>
                     <span className="contact-btn-main">@atlantis.charters</span>
                   </span>
                 </a>
               </div>
 
-              <p className="contact-reassurance">También puedes consultar disponibilidad directamente desde el calendario ↑</p>
+              <p className="contact-reassurance">{t('contact.reassurance')}</p>
             </div>
 
           </motion.div>

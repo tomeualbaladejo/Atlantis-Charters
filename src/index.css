@@ -2048,3 +2048,103 @@ button, input, select, textarea { font-family: var(--font-body); }
   text-align: center;
   margin-top: 20px;
 }
+
+/* ── Lang Selector ── */
+.lang-selector {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.lang-current {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 4px 10px 4px 8px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #fff;
+  transition: background 0.18s, border-color 0.18s;
+  white-space: nowrap;
+}
+.lang-current:hover {
+  background: rgba(255,255,255,0.28);
+  border-color: rgba(255,255,255,0.5);
+}
+.lang-flag {
+  font-size: 14px;
+  line-height: 1;
+}
+.lang-code {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.lang-chevron {
+  opacity: 0.75;
+  transition: transform 0.18s;
+}
+.lang-chevron.open {
+  transform: rotate(180deg);
+}
+.lang-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  list-style: none;
+  padding: 4px;
+  min-width: 90px;
+  z-index: 200;
+}
+.lang-dropdown li {
+  list-style: none;
+}
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  transition: background 0.14s;
+  text-align: left;
+  white-space: nowrap;
+}
+.lang-option:hover {
+  background: var(--sand);
+}
+.lang-option.active {
+  background: rgba(200,87,74,0.1);
+  color: var(--terra);
+  font-weight: 700;
+}
+
+/* Mobile overlay lang selector */
+.mobile-overlay .lang-selector .lang-current {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.25);
+  font-size: 13px;
+  padding: 6px 12px 6px 10px;
+}
+.mobile-overlay .lang-dropdown {
+  top: auto;
+  bottom: calc(100% + 6px);
+  right: 50%;
+  transform: translateX(50%);
+}

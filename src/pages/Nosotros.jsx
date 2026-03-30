@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -39,31 +40,20 @@ function IconHeart() {
   )
 }
 
-const VALUES = [
-  {
-    icon: <IconAnchor />,
-    title: 'Experiencia local',
-    body: 'Llevamos años navegando estas aguas. Conocemos cada rincón, cada cala y cada momento especial del norte de Mallorca.',
-  },
-  {
-    icon: <IconStar />,
-    title: 'Trip all included',
-    body: 'Tapas españolas, bebidas locales, snorkel y paddle surf. Todo está incluido para que solo pienses en disfrutar.',
-  },
-  {
-    icon: <IconHeart />,
-    title: 'Trato familiar',
-    body: 'No somos una empresa, somos una familia. Cada cliente a bordo es un invitado más en nuestra casa.',
-  },
-]
-
 export default function Nosotros() {
+  const { t } = useLanguage()
   const navigate = useNavigate()
 
   const goReservar = () => {
     navigate('/')
     setTimeout(() => document.getElementById('reservar')?.scrollIntoView({ behavior: 'smooth' }), 150)
   }
+
+  const VALUES = [
+    { icon: <IconAnchor />, titleKey: 'nos.val.1.title', bodyKey: 'nos.val.1.body' },
+    { icon: <IconStar />,   titleKey: 'nos.val.2.title', bodyKey: 'nos.val.2.body' },
+    { icon: <IconHeart />,  titleKey: 'nos.val.3.title', bodyKey: 'nos.val.3.body' },
+  ]
 
   return (
     <motion.div
@@ -83,7 +73,7 @@ export default function Nosotros() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
         >
-          Conoce al equipo
+          {t('nos.page.tag')}
         </motion.p>
         <motion.h1
           id="nosHeading"
@@ -91,7 +81,7 @@ export default function Nosotros() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.25 }}
         >
-          Somos Feli &amp; Fede
+          {t('nos.page.h1')}
         </motion.h1>
         <motion.p
           className="page-hero-sub"
@@ -99,7 +89,7 @@ export default function Nosotros() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          Los capitanes del Atlantis
+          {t('nos.page.sub')}
         </motion.p>
         <motion.hr
           className="hero-rule"
@@ -121,24 +111,26 @@ export default function Nosotros() {
             whileInView="show"
             viewport={inView}
           >
-            <motion.p className="story-tag" variants={fadeUp}>Nuestra historia</motion.p>
-            <motion.p className="story-body" id="storyHeading" variants={fadeUp}>
-              Y llegó el momento en nuestras vidas en que decidimos juntar nuestras
-              dos grandes pasiones: <strong>viajar</strong> y el <strong>mar</strong>.
-            </motion.p>
-            <motion.p className="story-body" variants={fadeUp}>
-              Hoy somos los capis de nuestro propio <strong>barco</strong> y queremos
-              invitarlos a compartir esta pasión mostrándoles esos{' '}
-              <strong>lugarcitos imperdibles</strong> del norte de la isla a bordo del Atlantis.
-            </motion.p>
-            <motion.p className="story-body" variants={fadeUp}>
-              Cada salida es diferente — el viento, la luz y el mar siempre mandan.
-              Pero lo que nunca cambia es nuestra forma de recibirlos: como si fueran
-              amigos de toda la vida.
-            </motion.p>
+            <motion.p className="story-tag" variants={fadeUp}>{t('nos.story.tag')}</motion.p>
+            <motion.p
+              className="story-body"
+              id="storyHeading"
+              variants={fadeUp}
+              dangerouslySetInnerHTML={{ __html: t('nos.story.1') }}
+            />
+            <motion.p
+              className="story-body"
+              variants={fadeUp}
+              dangerouslySetInnerHTML={{ __html: t('nos.story.2') }}
+            />
+            <motion.p
+              className="story-body"
+              variants={fadeUp}
+              dangerouslySetInnerHTML={{ __html: t('nos.story.3') }}
+            />
             <motion.div variants={fadeUp}>
               <button className="story-cta" onClick={goReservar}>
-                Reserva tu experiencia →
+                {t('nos.story.cta')}
               </button>
             </motion.div>
           </motion.div>
@@ -182,9 +174,9 @@ export default function Nosotros() {
           viewport={inView}
           transition={{ duration: 0.7 }}
         >
-          <p className="section-tag">Por qué elegirnos</p>
+          <p className="section-tag">{t('nos.values.tag')}</p>
           <h2 className="section-headline" id="valuesHeading" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)' }}>
-            Lo que nos hace diferentes
+            {t('nos.values.h2')}
           </h2>
         </motion.div>
 
@@ -199,8 +191,8 @@ export default function Nosotros() {
           {VALUES.map((v, i) => (
             <motion.div key={i} className="val-card" role="listitem" variants={fadeUp}>
               <div className="val-icon-wrap" aria-hidden="true">{v.icon}</div>
-              <h3 className="val-title">{v.title}</h3>
-              <p className="val-body">{v.body}</p>
+              <h3 className="val-title">{t(v.titleKey)}</h3>
+              <p className="val-body">{t(v.bodyKey)}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -215,8 +207,8 @@ export default function Nosotros() {
         viewport={inView}
         transition={{ duration: 0.7 }}
       >
-        <h2 id="nosCtaHeading">¿Hablamos?</h2>
-        <p>Escríbenos por WhatsApp o Instagram y te respondemos enseguida.</p>
+        <h2 id="nosCtaHeading">{t('nos.cta.h2')}</h2>
+        <p>{t('nos.cta.body')}</p>
         <div className="cta-buttons">
           <a
             className="btn-outline-white"
@@ -224,7 +216,7 @@ export default function Nosotros() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            WhatsApp
+            {t('nos.cta.wa')}
           </a>
           <a
             className="btn-outline-white"
@@ -232,10 +224,10 @@ export default function Nosotros() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Instagram
+            {t('nos.cta.ig')}
           </a>
           <button className="btn-outline-white" onClick={goReservar}>
-            Formulario de reserva
+            {t('nos.cta.form')}
           </button>
         </div>
       </motion.section>

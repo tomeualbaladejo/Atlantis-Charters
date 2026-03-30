@@ -1,13 +1,8 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-
-const FOOT_LINKS = [
-  { label: 'Inicio',      path: '/' },
-  { label: 'Experiencia', path: '/experiencia' },
-  { label: 'Destinos',    path: '/destinos' },
-  { label: 'Nosotros',    path: '/nosotros' },
-]
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function Footer() {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -20,6 +15,13 @@ export default function Footer() {
     }
   }
 
+  const FOOT_LINKS = [
+    { labelKey: 'nav.inicio',      path: '/' },
+    { labelKey: 'nav.experiencia', path: '/experiencia' },
+    { labelKey: 'nav.destinos',    path: '/destinos' },
+    { labelKey: 'nav.nosotros',    path: '/nosotros' },
+  ]
+
   return (
     <footer className="footer">
       <div className="foot-inner">
@@ -29,16 +31,16 @@ export default function Footer() {
 
         <ul className="foot-links">
           {FOOT_LINKS.map(item => (
-            <li key={item.label}>
-              <Link to={item.path}>{item.label}</Link>
+            <li key={item.labelKey}>
+              <Link to={item.path}>{t(item.labelKey)}</Link>
             </li>
           ))}
           <li>
-            <button onClick={goReservar}>Reservar</button>
+            <button onClick={goReservar}>{t('nav.reservar')}</button>
           </li>
         </ul>
 
-        <p className="foot-copy">© 2025 Atlantis Charters&nbsp;·&nbsp;Mallorca</p>
+        <p className="foot-copy">{t('footer.copy')}</p>
       </div>
     </footer>
   )

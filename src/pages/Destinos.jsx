@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -167,6 +168,7 @@ const DESTINATIONS = [
    UNIFIED MODAL COMPONENT
 ───────────────────────────────────────────── */
 function DestModal({ activeId, currentSlide, onClose, onPrev, onNext }) {
+  const { t } = useLanguage()
   if (!activeId) return null
   const cfg = MODAL_CONFIG[activeId]
   if (!cfg) return null
@@ -209,7 +211,7 @@ function DestModal({ activeId, currentSlide, onClose, onPrev, onNext }) {
         </div>
 
         {/* Close */}
-        <button className="modal-close" onClick={onClose} aria-label="Cerrar">×</button>
+        <button className="modal-close" onClick={onClose} aria-label={t('dest.modal.close')}>×</button>
 
         {/* Content */}
         <div className="modal-content">
@@ -255,30 +257,27 @@ function PalmIcon() {
    PAGE
 ───────────────────────────────────────────── */
 export default function Destinos() {
+  const { t } = useLanguage()
   const navigate = useNavigate()
 
-  /* ── Modal state — one set covers all modals ── */
   const [activeModal, setActiveModal] = useState(null)
   const [slide,       setSlide]       = useState(0)
   const [resetKey,    setResetKey]    = useState(0)
 
   const slideCount = activeModal ? (MODAL_CONFIG[activeModal]?.slides.length ?? 1) : 1
 
-  /* Autoplay — skipped for single-slide modals */
   useEffect(() => {
     if (!activeModal || slideCount <= 1) return
-    const t = setInterval(() => setSlide(s => (s + 1) % slideCount), 3500)
-    return () => clearInterval(t)
+    const timer = setInterval(() => setSlide(s => (s + 1) % slideCount), 3500)
+    return () => clearInterval(timer)
   }, [activeModal, resetKey, slideCount])
 
-  /* Escape key */
   useEffect(() => {
     const onKey = e => { if (e.key === 'Escape' && activeModal) closeModal() }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [activeModal])
 
-  /* Body scroll lock */
   useEffect(() => {
     document.body.style.overflow = activeModal ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
@@ -286,8 +285,8 @@ export default function Destinos() {
 
   const openModal  = (id) => { setSlide(0); setActiveModal(id) }
   const closeModal = ()   => setActiveModal(null)
-  const goNext     = ()   => { setSlide(s => (s + 1) % slideCount);                 setResetKey(k => k + 1) }
-  const goPrev     = ()   => { setSlide(s => (s + slideCount - 1) % slideCount);    setResetKey(k => k + 1) }
+  const goNext     = ()   => { setSlide(s => (s + 1) % slideCount);              setResetKey(k => k + 1) }
+  const goPrev     = ()   => { setSlide(s => (s + slideCount - 1) % slideCount); setResetKey(k => k + 1) }
 
   const goReservar = () => {
     navigate('/')
@@ -312,7 +311,7 @@ export default function Destinos() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
         >
-          Norte de Mallorca&nbsp;·&nbsp;Bahía de Pollença
+          {t('dest.page.tag')}
         </motion.p>
         <motion.h1
           id="heroHeading"
@@ -320,7 +319,7 @@ export default function Destinos() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.25 }}
         >
-          Nuestros destinos secretos
+          {t('dest.page.h1')}
         </motion.h1>
         <motion.p
           className="page-hero-sub"
@@ -328,7 +327,7 @@ export default function Destinos() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          Cada salida es única. Estos son los rincones que visitamos a bordo del Atlantis.
+          {t('dest.page.sub')}
         </motion.p>
         <motion.hr
           className="hero-rule"
@@ -380,7 +379,7 @@ export default function Destinos() {
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
                     <polygon points="0,0 10,5 0,10" />
                   </svg>
-                  Ver galería →
+                  {t('dest.card.gallery')}
                 </div>
               </div>
             </motion.article>
@@ -389,12 +388,10 @@ export default function Destinos() {
           {/* Teaser card */}
           <motion.article className="dest-card card-teaser" variants={fadeUp}>
             <div className="teaser-icon" aria-hidden="true"><PalmIcon /></div>
-            <h2 className="teaser-title">Y otros rincones secretos...</h2>
-            <p className="teaser-body">
-              Cada día es diferente. El capitán elige la ruta según el viento, el mar y la magia del momento.
-            </p>
+            <h2 className="teaser-title">{t('dest.teaser.title')}</h2>
+            <p className="teaser-body">{t('dest.teaser.body')}</p>
             <button className="teaser-btn" onClick={goReservar}>
-              Reservar ahora →
+              {t('dest.teaser.btn')}
             </button>
           </motion.article>
         </motion.div>
@@ -409,19 +406,19 @@ export default function Destinos() {
         viewport={inView}
         transition={{ duration: 0.7 }}
       >
-        <h2 id="ctaHeading">¿Quieres descubrir estos lugares?</h2>
-        <p>Embarca con nosotros. El Mediterráneo tiene muchas caras — te mostraremos las más bonitas.</p>
+        <h2 id="ctaHeading">{t('dest.cta.h2')}</h2>
+        <p>{t('dest.cta.body')}</p>
         <div className="cta-buttons">
           <button className="btn-filled" onClick={goReservar}>
-            Consultar disponibilidad →
+            {t('dest.cta.btn')}
           </button>
-          <Link to="/" className="btn-outline">Volver al inicio</Link>
+          <Link to="/" className="btn-outline">{t('dest.cta.home')}</Link>
         </div>
       </motion.section>
 
       <Footer />
 
-      {/* ── MODAL (single instance, driven by activeModal state) ── */}
+      {/* ── MODAL ── */}
       <DestModal
         activeId={activeModal}
         currentSlide={slide}

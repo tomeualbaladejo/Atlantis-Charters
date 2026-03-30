@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -45,6 +46,7 @@ function IconGlass() {
 }
 
 export default function Experiencia() {
+  const { t } = useLanguage()
   const navigate = useNavigate()
 
   const goReservar = () => {
@@ -70,7 +72,7 @@ export default function Experiencia() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
         >
-          A bordo del Atlantis
+          {t('exp.page.tag')}
         </motion.p>
         <motion.h1
           id="expPageHeading"
@@ -78,7 +80,7 @@ export default function Experiencia() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.25 }}
         >
-          Una experiencia única en el Mediterráneo
+          {t('exp.page.h1')}
         </motion.h1>
         <motion.p
           className="page-hero-sub"
@@ -86,7 +88,7 @@ export default function Experiencia() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          Descubre lo que hace especial cada salida a bordo del Atlantis.
+          {t('exp.page.sub')}
         </motion.p>
         <motion.hr
           className="hero-rule"
@@ -108,34 +110,34 @@ export default function Experiencia() {
             whileInView="show"
             viewport={inView}
           >
-            <motion.p className="section-tag" variants={fadeUp}>La Experiencia</motion.p>
+            <motion.p className="section-tag" variants={fadeUp}>{t('exp.section.tag')}</motion.p>
             <motion.h2 className="section-headline" id="expHeading" variants={fadeUp}>
-              Un día en el Mediterráneo<br />que no olvidarás
+              {t('exp.section.h2').split('\n').map((line, i, arr) => (
+                i < arr.length - 1 ? <span key={i}>{line}<br /></span> : <span key={i}>{line}</span>
+              ))}
             </motion.h2>
-            <motion.p variants={fadeUp}>
-              Zarpa desde las costas de Mallorca a bordo del Atlantis, un llaut mallorquín restaurado con esmero que combina la autenticidad de la tradición náutica con el confort más refinado. Descubre calas ocultas de aguas turquesas, fondea en rincones que solo se alcanzan por mar, y vive el Mediterráneo como lo han vivido siempre los mallorquines — con calma, sabor y gratitud.
-            </motion.p>
+            <motion.p variants={fadeUp}>{t('exp.body')}</motion.p>
 
             <motion.div className="highlights" variants={stagger}>
               <motion.div className="hl-item" variants={fadeUp}>
                 <div className="hl-icon"><IconAnchor /></div>
                 <div className="hl-text">
-                  <strong>Todo incluido</strong>
-                  <span>Combustible, tripulación, equipo de snorkel y seguridad</span>
+                  <strong>{t('exp.hl1.title')}</strong>
+                  <span>{t('exp.hl1.sub')}</span>
                 </div>
               </motion.div>
               <motion.div className="hl-item" variants={fadeUp}>
                 <div className="hl-icon"><IconFish /></div>
                 <div className="hl-text">
-                  <strong>Snorkel &amp; Spots secretos</strong>
-                  <span>Calas vírgenes solo accesibles por barco, aguas cristalinas</span>
+                  <strong>{t('exp.hl2.title')}</strong>
+                  <span>{t('exp.hl2.sub')}</span>
                 </div>
               </motion.div>
               <motion.div className="hl-item" variants={fadeUp}>
                 <div className="hl-icon"><IconGlass /></div>
                 <div className="hl-text">
-                  <strong>Bebidas y aperitivos</strong>
-                  <span>Vino local, refrescos y picoteo mallorquín a bordo</span>
+                  <strong>{t('exp.hl3.title')}</strong>
+                  <span>{t('exp.hl3.sub')}</span>
                 </div>
               </motion.div>
             </motion.div>
@@ -169,13 +171,11 @@ export default function Experiencia() {
             whileInView="show"
             viewport={inView}
           >
-            <motion.p className="section-tag" variants={fadeUp}>El Barco</motion.p>
+            <motion.p className="section-tag" variants={fadeUp}>{t('exp.boat.tag')}</motion.p>
             <motion.h2 className="section-headline" id="boatHeading" variants={fadeUp}>
-              Conoce al Atlantis
+              {t('exp.boat.h2')}
             </motion.h2>
-            <motion.p variants={fadeUp}>
-              Un llaut mallorquín de madera restaurado a mano, reflejo fiel de la identidad marinera de las Islas Baleares. El Atlantis combina la elegancia de lo artesanal con la solidez de décadas en el mar.
-            </motion.p>
+            <motion.p variants={fadeUp}>{t('exp.boat.body')}</motion.p>
           </motion.div>
 
           <motion.div
@@ -188,9 +188,9 @@ export default function Experiencia() {
             viewport={inView}
           >
             {[
-              { val: '12 m',  lbl: 'Eslora' },
-              { val: '12',    lbl: 'Capacidad' },
-              { val: 'Mixto', lbl: 'Vela + Auxiliar' },
+              { val: '12 m',  lbl: t('exp.spec.1.lbl') },
+              { val: '12',    lbl: t('exp.spec.2.lbl') },
+              { val: t('exp.spec.3.val'), lbl: t('exp.spec.3.lbl') },
             ].map(s => (
               <motion.div className="spec" key={s.lbl} role="listitem" variants={fadeUp}>
                 <span className="spec-val">{s.val}</span>
@@ -225,8 +225,8 @@ export default function Experiencia() {
           viewport={inView}
           transition={{ duration: 0.7 }}
         >
-          <p className="section-tag">Galería</p>
-          <h2 className="section-headline" id="galHeading">El verano en imágenes</h2>
+          <p className="section-tag">{t('exp.gallery.tag')}</p>
+          <h2 className="section-headline" id="galHeading">{t('exp.gallery.h2')}</h2>
         </motion.div>
 
         <motion.div
@@ -262,11 +262,11 @@ export default function Experiencia() {
         viewport={inView}
         transition={{ duration: 0.7 }}
       >
-        <h2 id="expCtaHeading">¿Quieres vivir esta experiencia?</h2>
-        <p>Plazas limitadas. Reserva con antelación y asegura tu día perfecto en el Mediterráneo.</p>
+        <h2 id="expCtaHeading">{t('exp.cta.h2')}</h2>
+        <p>{t('exp.cta.body')}</p>
         <div className="cta-buttons">
           <button className="btn-filled" onClick={goReservar}>
-            Consultar disponibilidad →
+            {t('exp.cta.btn')}
           </button>
         </div>
       </motion.section>
