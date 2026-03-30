@@ -293,6 +293,11 @@ export default function Destinos() {
     setTimeout(() => document.getElementById('reservar')?.scrollIntoView({ behavior: 'smooth' }), 150)
   }
 
+  useEffect(() => {
+    document.title = 'Destinos | Formentor, Cala Murta, La Victoria — Atlantis Charters'
+    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Visitamos los rincones más bonitos del norte de Mallorca: Playa Formentor, Cala Murta, La Fortaleza, La Victoria e Isla de Formentor. Solo accesibles desde el mar.')
+  }, [])
+
   return (
     <motion.div
       className="page-wrapper"

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Navbar from '../components/Navbar'
@@ -54,6 +55,11 @@ export default function Nosotros() {
     { icon: <IconStar />,   titleKey: 'nos.val.2.title', bodyKey: 'nos.val.2.body' },
     { icon: <IconHeart />,  titleKey: 'nos.val.3.title', bodyKey: 'nos.val.3.body' },
   ]
+
+  useEffect(() => {
+    document.title = 'Feli & Fede | Capitanes del Atlantis — Port de Pollença'
+    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Somos Feli y Fede, capitanes del Atlantis. Un proyecto familiar nacido del amor por el mar y Mallorca. Conoce nuestra historia.')
+  }, [])
 
   return (
     <motion.div

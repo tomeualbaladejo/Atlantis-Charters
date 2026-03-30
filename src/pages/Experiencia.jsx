@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Navbar from '../components/Navbar'
@@ -48,6 +49,11 @@ function IconGlass() {
 export default function Experiencia() {
   const { t } = useLanguage()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    document.title = 'La Experiencia | Atlantis Charters Mallorca'
+    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Descubre qué incluye una salida a bordo del Atlantis. Trip all included: tapas españolas, bebidas, snorkel y los mejores rincones del norte de Mallorca.')
+  }, [])
 
   const goReservar = () => {
     navigate('/')

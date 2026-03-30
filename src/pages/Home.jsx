@@ -345,6 +345,11 @@ export default function Home() {
   const [availOpen, setAvailOpen] = useState(false)
 
   useEffect(() => {
+    document.title = 'Atlantis Charters | Alquiler de Barco en Port de Pollença, Mallorca'
+    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Vive una experiencia única a bordo de nuestro llaut mallorquín tradicional. Excursiones por el norte de Mallorca con snorkel, tapas y rincones secretos. Reserva ahora.')
+  }, [])
+
+  useEffect(() => {
     if (location.hash) {
       const el = document.querySelector(location.hash)
       if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 120)
