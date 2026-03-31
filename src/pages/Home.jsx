@@ -1,10 +1,9 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useLanguage } from '../contexts/LanguageContext'
-import { MONTH_NAMES_BY_LANG, DAY_LABELS_BY_LANG, formatDate } from '../i18n/translations'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -16,12 +15,12 @@ const stagger = {
 }
 const inView = { once: true, margin: '-80px' }
 
-/* ── Google Calendar ── */
-const CALENDAR_ID = '5a5db2572ebedac3b8a4ff1b20be073b8c401613be54e5696392b080f17cd66a@group.calendar.google.com'
-const API_KEY     = 'AIzaSyCHwWh-VLu5G5zpB8-GsaVd7bHNnJzi1Vw'
-
-function toYMD(date) {
-  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`
+/* ── Calendly URLs ── */
+const CALENDLY_URLS = {
+  'morning':  'https://calendly.com/tomeualbaladejo/30min',
+  'afternoon': 'https://calendly.com/tomeualbaladejo/medio-dia-tarde-atlantis-charters',
+  'full':     'https://calendly.com/tomeualbaladejo/dia-completo-atlantis-charters',
+  'sunset':   'https://calendly.com/tomeualbaladejo/medio-dia-tarde-atlantis-charters',
 }
 
 /* ── Review data ── */
@@ -64,63 +63,23 @@ const REVIEWS = [
   },
 ]
 
-/* ── Availability Modal ── */
-function AvailabilityModal({ isOpen, onClose, initialPax, initialDuration }) {
-  const { t, lang } = useLanguage()
-  const MONTH_NAMES = MONTH_NAMES_BY_LANG[lang] || MONTH_NAMES_BY_LANG.es
-  const DAY_LABELS  = DAY_LABELS_BY_LANG[lang]  || DAY_LABELS_BY_LANG.es
-
-  const today    = new Date()
-  today.setHours(0, 0, 0, 0)
-  const todayYMD = toYMD(today)
-
-  const [viewYear,    setViewYear]    = useState(today.getFullYear())
-  const [viewMonth,   setViewMonth]   = useState(today.getMonth())
-  const [bookedDates, setBookedDates] = useState({})
-  const [loading,     setLoading]     = useState(false)
-  const [selectedDate, setSelectedDate] = useState(null)
-
-  const [modalPax,      setModalPax]      = useState('')
-  const [modalDuration, setModalDuration] = useState('')
-  const [paxError,      setPaxError]      = useState(false)
-  const [durError,      setDurError]      = useState(false)
+/* ── Calendly Modal ── */
+function CalendlyModal({ isOpen, onClose, durationType }) {
+  const { t } = useLanguage()
+  const [showSelection, setShowSelection] = useState(true)
+  const [calendlyUrl, setCalendlyUrl] = useState('')
 
   useEffect(() => {
     if (isOpen) {
-      setModalPax(initialPax || '')
-      setModalDuration(initialDuration || '')
-      setSelectedDate(null)
-      setPaxError(false)
-      setDurError(false)
+      if (durationType && CALENDLY_URLS[durationType]) {
+        setShowSelection(false)
+        setCalendlyUrl(CALENDLY_URLS[durationType])
+      } else {
+        setShowSelection(true)
+        setCalendlyUrl('')
+      }
     }
-  }, [isOpen])
-
-  const cacheKey = `${viewYear}-${viewMonth}`
-
-  const fetchBooked = useCallback(async (year, month) => {
-    const key = `${year}-${month}`
-    if (bookedDates[key]) return
-    setLoading(true)
-    try {
-      const timeMin = new Date(year, month, 1).toISOString()
-      const timeMax = new Date(year, month + 1, 0, 23, 59, 59).toISOString()
-      const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${encodeURIComponent(timeMin)}&timeMax=${encodeURIComponent(timeMax)}&singleEvents=true`
-      const res  = await fetch(url)
-      const data = await res.json()
-      const dates = new Set(
-        (data.items || []).map(ev => ev.start.date || ev.start.dateTime?.split('T')[0]).filter(Boolean)
-      )
-      setBookedDates(prev => ({ ...prev, [key]: dates }))
-    } catch {
-      setBookedDates(prev => ({ ...prev, [key]: new Set() }))
-    } finally {
-      setLoading(false)
-    }
-  }, [bookedDates])
-
-  useEffect(() => {
-    if (isOpen) fetchBooked(viewYear, viewMonth)
-  }, [isOpen, viewYear, viewMonth])
+  }, [isOpen, durationType])
 
   useEffect(() => {
     if (!isOpen) return
@@ -134,74 +93,22 @@ function AvailabilityModal({ isOpen, onClose, initialPax, initialDuration }) {
     return () => { document.body.style.overflow = '' }
   }, [isOpen])
 
-  const goToPrevMonth = () => {
-    const newDate = new Date(viewYear, viewMonth - 1, 1)
-    if (newDate < new Date(today.getFullYear(), today.getMonth(), 1)) return
-    setViewYear(newDate.getFullYear())
-    setViewMonth(newDate.getMonth())
+  const selectOption = (type) => {
+    setShowSelection(false)
+    setCalendlyUrl(CALENDLY_URLS[type])
   }
 
-  const goToNextMonth = () => {
-    const maxDate = new Date(today.getFullYear(), today.getMonth() + 3, 1)
-    const newDate = new Date(viewYear, viewMonth + 1, 1)
-    if (newDate >= maxDate) return
-    setViewYear(newDate.getFullYear())
-    setViewMonth(newDate.getMonth())
-  }
-
-  const isAtMinMonth = viewYear === today.getFullYear() && viewMonth === today.getMonth()
-  const isAtMaxMonth = (() => {
-    const max = new Date(today.getFullYear(), today.getMonth() + 2, 1)
-    return viewYear === max.getFullYear() && viewMonth === max.getMonth()
-  })()
-
-  const firstDay = new Date(viewYear, viewMonth, 1)
-  let startOffset = firstDay.getDay() - 1
-  if (startOffset < 0) startOffset = 6
-  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate()
-
-  const bookedSet = bookedDates[cacheKey] || new Set()
-
-  const cells = []
-  for (let i = 0; i < startOffset; i++) cells.push(null)
-  for (let d = 1; d <= daysInMonth; d++) {
-    const ymd     = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-    const dateObj = new Date(viewYear, viewMonth, d)
-    cells.push({
-      d, ymd,
-      isPast:     dateObj < today,
-      isToday:    ymd === todayYMD,
-      isBooked:   bookedSet.has(ymd),
-      isSelected: ymd === selectedDate,
-    })
-  }
-
-  const handleDayClick = (cell) => {
-    if (!cell || cell.isPast || cell.isBooked) return
-    setSelectedDate(cell.ymd)
-  }
-
-  const handleWhatsApp = () => {
-    const noPax = !modalPax
-    const noDur = !modalDuration
-    setPaxError(noPax)
-    setDurError(noDur)
-    if (noPax || noDur) return
-    const msg = [
-      t('modal.wa.greeting'),
-      `${t('modal.wa.date')} ${formatDate(selectedDate, lang)}`,
-      `${t('modal.wa.pax')} ${modalPax}`,
-      `${t('modal.wa.dur')} ${modalDuration}`,
-      t('modal.wa.thanks'),
-    ].join('\n')
-    window.open(`https://wa.me/34611062419?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer')
-  }
+  const OPTIONS = [
+    { type: 'morning', title: t('calendly.morning.title'), time: '09:00 → 14:00' },
+    { type: 'afternoon', title: t('calendly.afternoon.title'), time: '15:00 → 20:00' },
+    { type: 'full', title: t('calendly.full.title'), time: '09:00 → 20:00' },
+  ]
 
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="modal-overlay avail-overlay"
+          className="calendly-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -209,7 +116,7 @@ function AvailabilityModal({ isOpen, onClose, initialPax, initialDuration }) {
           onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
         >
           <motion.div
-            className="avail-box"
+            className="calendly-modal"
             initial={{ opacity: 0, y: 32, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.97 }}
@@ -217,114 +124,41 @@ function AvailabilityModal({ isOpen, onClose, initialPax, initialDuration }) {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="avail-header">
-              <div>
-                <div className="avail-title">{t('modal.title')}</div>
-                <div className="avail-subtitle">{t('modal.subtitle')}</div>
+            <div className="calendly-header">
+              <div className="calendly-header-left">
+                <img src="/images/logo-atlantis.png" alt="Atlantis Charters" />
+                <span>{t('calendly.title')}</span>
               </div>
-              <button className="avail-close" onClick={onClose} aria-label={t('modal.close')}>×</button>
+              <button className="calendly-close" onClick={onClose} aria-label="Cerrar">×</button>
             </div>
 
-            {/* Selects */}
-            <div className="avail-selects">
-              <div className="avail-select-field">
-                <label className="avail-select-label" htmlFor="modalPax">{t('modal.pax.label')}</label>
-                <select
-                  id="modalPax"
-                  className={`avail-select${paxError ? ' avail-select--error' : ''}`}
-                  value={modalPax}
-                  onChange={e => { setModalPax(e.target.value); setPaxError(false) }}
-                >
-                  <option value="">{t('modal.pax.select')}</option>
-                  {[...Array(12)].map((_, i) => (
-                    <option key={i+1} value={`${i+1} ${i === 0 ? t('modal.pax.person') : t('modal.pax.plural')}`}>
-                      {i+1} {i === 0 ? t('modal.pax.person') : t('modal.pax.plural')}
-                    </option>
+            {/* Content */}
+            {showSelection ? (
+              <div className="calendly-selection">
+                <h3>{t('calendly.choose')}</h3>
+                <div className="calendly-cards">
+                  {OPTIONS.map(opt => (
+                    <button
+                      key={opt.type}
+                      className="calendly-card"
+                      onClick={() => selectOption(opt.type)}
+                    >
+                      <span className="calendly-card-title">{opt.title}</span>
+                      <span className="calendly-card-time">{opt.time}</span>
+                    </button>
                   ))}
-                </select>
-                {paxError && <span className="avail-select-error">{t('modal.pax.error')}</span>}
-              </div>
-              <div className="avail-select-field">
-                <label className="avail-select-label" htmlFor="modalDur">{t('modal.dur.label')}</label>
-                <select
-                  id="modalDur"
-                  className={`avail-select${durError ? ' avail-select--error' : ''}`}
-                  value={modalDuration}
-                  onChange={e => { setModalDuration(e.target.value); setDurError(false) }}
-                >
-                  <option value="">{t('modal.dur.select')}</option>
-                  <option value={t('modal.dur.morning')}>{t('modal.dur.morning')}</option>
-                  <option value={t('modal.dur.afternoon')}>{t('modal.dur.afternoon')}</option>
-                  <option value={t('modal.dur.full')}>{t('modal.dur.full')}</option>
-                  <option value={t('modal.dur.sunset')}>{t('modal.dur.sunset')}</option>
-                </select>
-                {durError && <span className="avail-select-error">{t('modal.dur.error')}</span>}
-              </div>
-            </div>
-
-            {/* Calendar */}
-            <div className="avail-body">
-              <div className="avail-month-nav">
-                <button className="avail-arrow" onClick={goToPrevMonth} disabled={isAtMinMonth} aria-label={t('modal.prev')}>←</button>
-                <span className="avail-month-label">{MONTH_NAMES[viewMonth]} {viewYear}</span>
-                <button className="avail-arrow" onClick={goToNextMonth} disabled={isAtMaxMonth} aria-label={t('modal.next')}>→</button>
-              </div>
-
-              <div className="avail-day-labels">
-                {DAY_LABELS.map(l => <span key={l}>{l}</span>)}
-              </div>
-
-              {loading ? (
-                <div className="avail-loading">
-                  <div className="avail-spinner" />
-                  <span>{t('modal.loading')}</span>
                 </div>
-              ) : (
-                <div className="avail-grid">
-                  {cells.map((cell, i) =>
-                    cell === null ? (
-                      <div key={`e-${i}`} />
-                    ) : (
-                      <button
-                        key={cell.ymd}
-                        className={[
-                          'avail-day',
-                          cell.isPast     ? 'avail-day--past'     : '',
-                          cell.isBooked   ? 'avail-day--booked'   : '',
-                          cell.isToday    ? 'avail-day--today'    : '',
-                          cell.isSelected ? 'avail-day--selected' : '',
-                        ].join(' ').trim()}
-                        onClick={() => handleDayClick(cell)}
-                        disabled={cell.isPast || cell.isBooked}
-                        aria-label={`${cell.d} ${MONTH_NAMES[viewMonth]}${cell.isBooked ? ` — ${t('modal.legend.booked')}` : ''}`}
-                        aria-pressed={cell.isSelected}
-                      >
-                        {cell.d}
-                      </button>
-                    )
-                  )}
-                </div>
-              )}
-
-              <div className="avail-legend">
-                <span className="legend-item"><span className="legend-dot legend-dot--available" />{t('modal.legend.available')}</span>
-                <span className="legend-item"><span className="legend-dot legend-dot--booked" />{t('modal.legend.booked')}</span>
-                <span className="legend-item"><span className="legend-dot legend-dot--selected" />{t('modal.legend.selected')}</span>
               </div>
-            </div>
-
-            {/* Summary + WhatsApp */}
-            {selectedDate && (
-              <div className="avail-summary">
-                <div className="avail-summary-rows">
-                  <div className="avail-summary-row">
-                    <span><strong>{t('modal.summary.date')}</strong> {formatDate(selectedDate, lang)}</span>
-                  </div>
-                </div>
-                <button className="avail-whatsapp-btn" onClick={handleWhatsApp}>
-                  {t('modal.wa.btn')}
-                </button>
-                <p className="avail-whatsapp-note">{t('modal.wa.note')}</p>
+            ) : (
+              <div className="calendly-embed">
+                <iframe
+                  src={`${calendlyUrl}?hide_gdpr_banner=1&primary_color=C85A4A&text_color=1C1C1A&background_color=ffffff&embed_type=Inline`}
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  title="Calendly Booking"
+                  style={{ border: 'none', minHeight: '580px' }}
+                />
               </div>
             )}
           </motion.div>
@@ -342,7 +176,8 @@ export default function Home() {
 
   const [pax,      setPax]      = useState('')
   const [duration, setDuration] = useState('')
-  const [availOpen, setAvailOpen] = useState(false)
+  const [calendlyOpen, setCalendlyOpen] = useState(false)
+  const [durationType, setDurationType] = useState('')
 
   useEffect(() => {
     document.title = 'Atlantis Charters | Alquiler de Barco en Port de Pollença, Mallorca'
@@ -356,6 +191,18 @@ export default function Home() {
     }
   }, [location.hash])
 
+  const openCalendly = () => {
+    // Map duration value to type
+    const durationMap = {
+      [t('book.dur.morning')]: 'morning',
+      [t('book.dur.afternoon')]: 'afternoon',
+      [t('book.dur.full')]: 'full',
+      [t('book.dur.sunset')]: 'sunset',
+    }
+    setDurationType(durationMap[duration] || '')
+    setCalendlyOpen(true)
+  }
+
   return (
     <motion.div
       className="page-wrapper"
@@ -366,12 +213,11 @@ export default function Home() {
     >
       <Navbar />
 
-      {/* ── AVAILABILITY MODAL ── */}
-      <AvailabilityModal
-        isOpen={availOpen}
-        onClose={() => setAvailOpen(false)}
-        initialPax={pax}
-        initialDuration={duration}
+      {/* ── CALENDLY MODAL ── */}
+      <CalendlyModal
+        isOpen={calendlyOpen}
+        onClose={() => setCalendlyOpen(false)}
+        durationType={durationType}
       />
 
       {/* ── HERO ── */}
@@ -437,12 +283,13 @@ export default function Home() {
               <label htmlFor="hDur">{t('book.dur')}</label>
               <select id="hDur" value={duration} onChange={e => setDuration(e.target.value)}>
                 <option value="">{t('book.select')}</option>
-                <option>{t('book.dur.half')}</option>
-                <option>{t('book.dur.full')}</option>
-                <option>{t('book.dur.sunset')}</option>
+                <option value={t('book.dur.morning')}>{t('book.dur.morning')}</option>
+                <option value={t('book.dur.afternoon')}>{t('book.dur.afternoon')}</option>
+                <option value={t('book.dur.full')}>{t('book.dur.full')}</option>
+                <option value={t('book.dur.sunset')}>{t('book.dur.sunset')}</option>
               </select>
             </div>
-            <button className="booking-cta-btn" onClick={() => setAvailOpen(true)} type="button">
+            <button className="booking-cta-btn" onClick={openCalendly} type="button">
               {t('book.cta')}
             </button>
           </motion.div>
