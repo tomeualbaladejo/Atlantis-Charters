@@ -5,6 +5,7 @@ import Home        from './pages/Home'
 import Experiencia from './pages/Experiencia'
 import Destinos    from './pages/Destinos'
 import Nosotros    from './pages/Nosotros'
+import Admin       from './pages/Admin'
 
 export default function App() {
   const location = useLocation()
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/experiencia" element={<Experiencia />} />
           <Route path="/destinos"    element={<Destinos />} />
           <Route path="/nosotros"    element={<Nosotros />} />
+          <Route path="/admin"       element={<Admin />} />
           {/* backward-compat redirect */}
           <Route path="/places"      element={<Navigate to="/destinos" replace />} />
         </Routes>

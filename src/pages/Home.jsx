@@ -1,8 +1,9 @@
 import { useRef, useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BookingWidget from '../components/BookingWidget'
 import { useLanguage } from '../contexts/LanguageContext'
 
 const fadeUp = {
@@ -14,14 +15,6 @@ const stagger = {
   show:   { transition: { staggerChildren: 0.12 } },
 }
 const inView = { once: true, margin: '-80px' }
-
-/* ── Calendly URLs ── */
-const CALENDLY_URLS = {
-  'morning':  'https://calendly.com/tomeualbaladejo/30min',
-  'afternoon': 'https://calendly.com/tomeualbaladejo/medio-dia-tarde-atlantis-charters',
-  'full':     'https://calendly.com/tomeualbaladejo/dia-completo-atlantis-charters',
-  'sunset':   'https://calendly.com/tomeualbaladejo/medio-dia-tarde-atlantis-charters',
-}
 
 /* ── Review data ── */
 const REVIEWS = [
@@ -63,110 +56,6 @@ const REVIEWS = [
   },
 ]
 
-/* ── Calendly Modal ── */
-function CalendlyModal({ isOpen, onClose, durationType }) {
-  const { t } = useLanguage()
-  const [showSelection, setShowSelection] = useState(true)
-  const [calendlyUrl, setCalendlyUrl] = useState('')
-
-  useEffect(() => {
-    if (isOpen) {
-      if (durationType && CALENDLY_URLS[durationType]) {
-        setShowSelection(false)
-        setCalendlyUrl(CALENDLY_URLS[durationType])
-      } else {
-        setShowSelection(true)
-        setCalendlyUrl('')
-      }
-    }
-  }, [isOpen, durationType])
-
-  useEffect(() => {
-    if (!isOpen) return
-    const handler = (e) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [isOpen, onClose])
-
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [isOpen])
-
-  const selectOption = (type) => {
-    setShowSelection(false)
-    setCalendlyUrl(CALENDLY_URLS[type])
-  }
-
-  const OPTIONS = [
-    { type: 'morning', title: t('calendly.morning.title'), time: '09:00 → 14:00' },
-    { type: 'afternoon', title: t('calendly.afternoon.title'), time: '15:00 → 20:00' },
-    { type: 'full', title: t('calendly.full.title'), time: '09:00 → 20:00' },
-  ]
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          className="calendly-overlay"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.22 }}
-          onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
-        >
-          <motion.div
-            className="calendly-modal"
-            initial={{ opacity: 0, y: 32, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 24, scale: 0.97 }}
-            transition={{ duration: 0.28 }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="calendly-header">
-              <div className="calendly-header-left">
-                <img src="/images/logo-atlantis.png" alt="Atlantis Charters" />
-                <span>{t('calendly.title')}</span>
-              </div>
-              <button className="calendly-close" onClick={onClose} aria-label="Cerrar">×</button>
-            </div>
-
-            {/* Content */}
-            {showSelection ? (
-              <div className="calendly-selection">
-                <h3>{t('calendly.choose')}</h3>
-                <div className="calendly-cards">
-                  {OPTIONS.map(opt => (
-                    <button
-                      key={opt.type}
-                      className="calendly-card"
-                      onClick={() => selectOption(opt.type)}
-                    >
-                      <span className="calendly-card-title">{opt.title}</span>
-                      <span className="calendly-card-time">{opt.time}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="calendly-embed">
-                <iframe
-                  src={`${calendlyUrl}?hide_gdpr_banner=1&primary_color=C85A4A&text_color=1C1C1A&background_color=ffffff&embed_type=Inline`}
-                  width="100%"
-                  height="100%"
-                  frameBorder="0"
-                  title="Calendly Booking"
-                  style={{ border: 'none', minHeight: '580px' }}
-                />
-              </div>
-            )}
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  )
-}
 
 /* ── Home page ── */
 export default function Home() {
@@ -176,8 +65,8 @@ export default function Home() {
 
   const [pax,      setPax]      = useState('')
   const [duration, setDuration] = useState('')
-  const [calendlyOpen, setCalendlyOpen] = useState(false)
-  const [durationType, setDurationType] = useState('')
+  const [bookingOpen, setBookingOpen] = useState(false)
+  const [initialSession, setInitialSession] = useState('')
 
   useEffect(() => {
     document.title = 'Atlantis Charters | Alquiler de Barco en Port de Pollença, Mallorca'
@@ -191,16 +80,16 @@ export default function Home() {
     }
   }, [location.hash])
 
-  const openCalendly = () => {
-    // Map duration value to type
+  const openBooking = () => {
+    // Map duration value to session type
     const durationMap = {
       [t('book.dur.morning')]: 'morning',
-      [t('book.dur.afternoon')]: 'afternoon',
-      [t('book.dur.full')]: 'full',
+      [t('book.dur.afternoon')]: 'sunset',
+      [t('book.dur.full')]: '',
       [t('book.dur.sunset')]: 'sunset',
     }
-    setDurationType(durationMap[duration] || '')
-    setCalendlyOpen(true)
+    setInitialSession(durationMap[duration] || '')
+    setBookingOpen(true)
   }
 
   return (
@@ -213,11 +102,11 @@ export default function Home() {
     >
       <Navbar />
 
-      {/* ── CALENDLY MODAL ── */}
-      <CalendlyModal
-        isOpen={calendlyOpen}
-        onClose={() => setCalendlyOpen(false)}
-        durationType={durationType}
+      {/* ── BOOKING WIDGET ── */}
+      <BookingWidget
+        isOpen={bookingOpen}
+        onClose={() => setBookingOpen(false)}
+        initialSession={initialSession}
       />
 
       {/* ── HERO ── */}
@@ -289,7 +178,7 @@ export default function Home() {
                 <option value={t('book.dur.sunset')}>{t('book.dur.sunset')}</option>
               </select>
             </div>
-            <button className="booking-cta-btn" onClick={openCalendly} type="button">
+            <button className="booking-cta-btn" onClick={openBooking} type="button">
               {t('book.cta')}
             </button>
           </motion.div>
