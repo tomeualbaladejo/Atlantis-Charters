@@ -46,26 +46,45 @@ export default async function handler(req, res) {
       const date = event.start.date || event.start.dateTime?.split('T')[0];
       if (!date) return;
 
+      if (!bookedSlots[date]) bookedSlots[date] = { morning: false, sunset: false };
+
       const title = (event.summary || '').toLowerCase();
 
-      if (!bookedSlots[date]) {
-        bookedSlots[date] = { morning: false, sunset: false };
+      // Check event start time to determine session
+      let startHour = null;
+      if (event.start.dateTime) {
+        // Parse the hour from dateTime (format: 2026-04-19T09:00:00+02:00)
+        const startTime = new Date(event.start.dateTime);
+        startHour = startTime.getHours();
       }
 
-      // Check for specific session mentions
-      const hasMorning = title.includes('mañana') || title.includes('morning');
-      const hasSunset = title.includes('tarde') || title.includes('sunset') || title.includes('atardecer');
-      const isFull = title.includes('completo') || title.includes('full') || title.includes('booked');
+      // Determine session from title keywords first
+      const isMorningTitle = title.includes('mañana') || title.includes('morning') ||
+                             title.includes('manana');
+      const isSunsetTitle = title.includes('atardecer') || title.includes('sunset') ||
+                            title.includes('tarde');
+      const isFullDay = title.includes('completo') || title.includes('full') ||
+                        title.includes('día completo');
 
-      if (hasMorning || isFull) {
+      if (isFullDay) {
+        // Full day blocks both
         bookedSlots[date].morning = true;
-      }
-      if (hasSunset || isFull) {
         bookedSlots[date].sunset = true;
-      }
-
-      // If no specific session mentioned, block both
-      if (!hasMorning && !hasSunset && !isFull) {
+      } else if (isMorningTitle) {
+        bookedSlots[date].morning = true;
+      } else if (isSunsetTitle) {
+        bookedSlots[date].sunset = true;
+      } else if (startHour !== null) {
+        // Use start time to determine session
+        if (startHour < 13) {
+          // Starts before 1pm = morning session (09:00-14:00)
+          bookedSlots[date].morning = true;
+        } else {
+          // Starts at 1pm or later = sunset session (15:00-20:00)
+          bookedSlots[date].sunset = true;
+        }
+      } else {
+        // All-day event or unknown — block both to be safe
         bookedSlots[date].morning = true;
         bookedSlots[date].sunset = true;
       }
