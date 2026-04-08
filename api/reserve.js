@@ -24,7 +24,13 @@ export default async function handler(req, res) {
 
   const { date, session, name, email, phone, passengers, message } = req.body;
 
-  console.log('Reserve API called:', { date, session, passengers });
+  console.log('Reserve API called:', {
+    date,
+    session,
+    passengers,
+    hasSupabaseUrl: !!process.env.SUPABASE_URL,
+    hasSupabaseKey: !!process.env.SUPABASE_SERVICE_KEY
+  });
 
   // Validate required fields
   if (!date || !session || !name || !email || !phone || !passengers) {
@@ -77,8 +83,11 @@ export default async function handler(req, res) {
       .single();
 
     if (dbError) {
-      console.error('DB error:', dbError);
-      return res.status(500).json({ error: 'Database error saving reservation' });
+      console.error('DB error:', JSON.stringify(dbError, null, 2));
+      return res.status(500).json({
+        error: 'Database error saving reservation',
+        details: dbError.message || 'Unknown error'
+      });
     }
 
     // Format session details for emails
