@@ -92,12 +92,12 @@ export default async function handler(req, res) {
 
     // Format session details for emails
     const sessionLabel = session === 'morning'
-      ? 'Mañana (09:00 - 14:00)'
-      : 'Atardecer (15:00 - 20:00)';
+      ? 'Mañana (10:00 - 14:00)'
+      : 'Atardecer (16:00 - 20:00)';
 
     const sessionLabelEN = session === 'morning'
-      ? 'Morning (09:00 - 14:00)'
-      : 'Sunset (15:00 - 20:00)';
+      ? 'Morning (10:00 - 14:00)'
+      : 'Sunset (16:00 - 20:00)';
 
     const dateFormatted = new Date(date + 'T00:00:00').toLocaleDateString('es-ES', {
       weekday: 'long',

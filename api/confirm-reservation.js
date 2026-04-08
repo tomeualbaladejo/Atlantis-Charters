@@ -40,10 +40,10 @@ export default async function handler(req, res) {
 
     // Session details
     const sessionLabel = reservation.session === 'morning'
-      ? 'Mañana (09:00 - 14:00)'
-      : 'Atardecer (15:00 - 20:00)';
+      ? 'Mañana (10:00 - 14:00)'
+      : 'Atardecer (16:00 - 20:00)';
 
-    const startTime = reservation.session === 'morning' ? '09:00' : '15:00';
+    const startTime = reservation.session === 'morning' ? '10:00' : '16:00';
     const endTime = reservation.session === 'morning' ? '14:00' : '20:00';
 
     const dateFormatted = new Date(reservation.date + 'T00:00:00').toLocaleDateString('es-ES', {

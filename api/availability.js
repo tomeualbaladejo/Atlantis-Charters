@@ -76,11 +76,11 @@ export default async function handler(req, res) {
         bookedSlots[date].sunset = true;
       } else if (startHour !== null) {
         // Use start time to determine session
-        if (startHour < 13) {
-          // Starts before 1pm = morning session (09:00-14:00)
+        if (startHour < 14) {
+          // Starts before 2pm = morning session (10:00-14:00)
           bookedSlots[date].morning = true;
         } else {
-          // Starts at 1pm or later = sunset session (15:00-20:00)
+          // Starts at 2pm or later = sunset session (16:00-20:00)
           bookedSlots[date].sunset = true;
         }
       } else {

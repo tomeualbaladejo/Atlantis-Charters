@@ -318,7 +318,7 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
           >
             <span className="booking-session-icon">&#9728;</span>
             <span className="booking-session-name">{t('booking.session.morning')}</span>
-            <span className="booking-session-time">09:00 - 14:00</span>
+            <span className="booking-session-time">10:00 - 14:00</span>
             {!morningAvailable && <span className="booking-session-status">{t('booking.booked')}</span>}
           </button>
 
@@ -329,7 +329,7 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
           >
             <span className="booking-session-icon">&#127749;</span>
             <span className="booking-session-name">{t('booking.session.sunset')}</span>
-            <span className="booking-session-time">15:00 - 20:00</span>
+            <span className="booking-session-time">16:00 - 20:00</span>
             {!sunsetAvailable && <span className="booking-session-status">{t('booking.booked')}</span>}
           </button>
         </div>
@@ -460,8 +460,8 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
       { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
     )
     const sessionLabel = selectedSession === 'morning'
-      ? `${t('booking.session.morning')} (09:00 - 14:00)`
-      : `${t('booking.session.sunset')} (15:00 - 20:00)`
+      ? `${t('booking.session.morning')} (10:00 - 14:00)`
+      : `${t('booking.session.sunset')} (16:00 - 20:00)`
 
     return (
       <div className="booking-success">
