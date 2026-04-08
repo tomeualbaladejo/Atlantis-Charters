@@ -22,9 +22,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  console.log('Reserve API called:', { date, session, passengers });
-
   const { date, session, name, email, phone, passengers, message } = req.body;
+
+  console.log('Reserve API called:', { date, session, passengers });
 
   // Validate required fields
   if (!date || !session || !name || !email || !phone || !passengers) {
