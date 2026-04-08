@@ -60,7 +60,7 @@ export default async function handler(req, res) {
       return res.status(409).json({ error: 'This slot is already booked' });
     }
 
-    // Save to Supabase
+    // Save to Supabase as PENDING (captain must confirm)
     const { data: reservation, error: dbError } = await supabase
       .from('reservations')
       .insert([{
@@ -70,7 +70,8 @@ export default async function handler(req, res) {
         email: email.trim().toLowerCase(),
         phone: phone.trim(),
         passengers: passengersNum,
-        message: message?.trim() || null
+        message: message?.trim() || null,
+        status: 'pending'
       }])
       .select()
       .single();
@@ -103,10 +104,7 @@ export default async function handler(req, res) {
       day: 'numeric'
     });
 
-    // Note: Customer confirmation emails disabled until domain is verified in Resend
-    // Resend free tier only allows sending to verified email address
-
-    // Send notification email to captain
+    // Send notification email to captain with CONFIRM button
     try {
       const resendResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -117,151 +115,36 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           from: 'onboarding@resend.dev',
           to: ['tomeualbaladejo@gmail.com'],
-          subject: `🆕 Nueva reserva Atlantis — ${dateFormatted}`,
+          subject: `⏳ Nueva solicitud de reserva — ${dateFormatted}`,
           html: `
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            </head>
-            <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
-                <tr>
-                  <td align="center">
-                    <table width="100%" style="max-width: 600px; background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                      <!-- Header -->
-                      <tr>
-                        <td style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); padding: 30px 40px; text-align: center;">
-                          <h1 style="margin: 0; color: white; font-size: 28px; font-weight: 600;">
-                            🆕 Nueva Reserva
-                          </h1>
-                          <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9); font-size: 16px;">
-                            Atlantis Charters
-                          </p>
-                        </td>
-                      </tr>
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #ffffff;">
+  <h2 style="color: #C85A4A; margin-bottom: 4px;">Nueva solicitud de reserva</h2>
+  <p style="color: #6B6860; margin-bottom: 24px;">Un cliente quiere reservar una salida. Confirma para bloquear la fecha.</p>
 
-                      <!-- Alert Banner -->
-                      <tr>
-                        <td style="background-color: #fef3c7; padding: 15px 40px; border-left: 4px solid #f59e0b;">
-                          <p style="margin: 0; color: #92400e; font-size: 14px; line-height: 1.5;">
-                            ⚠️ <strong>Importante:</strong> El cliente aún no ha recibido confirmación automática.
-                            Contacta para confirmar la reserva.
-                          </p>
-                        </td>
-                      </tr>
+  <div style="background: #F5F0E8; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+    <table style="width: 100%; border-collapse: collapse;">
+      <tr><td style="padding: 8px 0; color: #6B6860; width: 130px;">Nombre</td><td style="padding: 8px 0; font-weight: bold;">${name}</td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860;">Email</td><td style="padding: 8px 0;"><a href="mailto:${email}" style="color: #C85A4A;">${email}</a></td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860;">Teléfono</td><td style="padding: 8px 0;"><a href="tel:${phone}" style="color: #C85A4A;">${phone}</a></td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860;">Fecha</td><td style="padding: 8px 0; font-weight: bold;">${dateFormatted}</td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860;">Sesión</td><td style="padding: 8px 0; font-weight: bold; color: #C85A4A;">${sessionLabel}</td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860;">Pasajeros</td><td style="padding: 8px 0;">${passengers}</td></tr>
+      ${message ? `<tr><td style="padding: 8px 0; color: #6B6860;">Mensaje</td><td style="padding: 8px 0;">${message}</td></tr>` : ''}
+    </table>
+  </div>
 
-                      <!-- Content -->
-                      <tr>
-                        <td style="padding: 40px;">
-                          <!-- Customer Info -->
-                          <div style="margin-bottom: 30px;">
-                            <h2 style="margin: 0 0 20px 0; color: #1e3a8a; font-size: 20px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
-                              Información del Cliente
-                            </h2>
-                            <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">
-                              <tr>
-                                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; color: #6b7280; font-size: 14px; width: 140px;">
-                                  <strong>Nombre:</strong>
-                                </td>
-                                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; color: #1f2937; font-size: 14px;">
-                                  ${name}
-                                </td>
-                              </tr>
-                              <tr>
-                                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; color: #6b7280; font-size: 14px;">
-                                  <strong>Email:</strong>
-                                </td>
-                                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
-                                  <a href="mailto:${email}" style="color: #3b82f6; text-decoration: none; font-size: 14px;">
-                                    ${email}
-                                  </a>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; color: #6b7280; font-size: 14px;">
-                                  <strong>Teléfono:</strong>
-                                </td>
-                                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
-                                  <a href="tel:${phone}" style="color: #3b82f6; text-decoration: none; font-size: 14px;">
-                                    ${phone}
-                                  </a>
-                                </td>
-                              </tr>
-                            </table>
-                          </div>
+  <div style="text-align: center; margin-bottom: 24px;">
+    <a href="https://atlantis-charters.vercel.app/api/confirm-reservation?id=${reservation.id}&token=${reservation.id}"
+       style="display: inline-block; background: #C85A4A; color: white; padding: 16px 40px; border-radius: 30px; text-decoration: none; font-size: 16px; font-weight: 500;">
+      ✅ Confirmar reserva
+    </a>
+  </div>
 
-                          <!-- Booking Details -->
-                          <div style="margin-bottom: 30px;">
-                            <h2 style="margin: 0 0 20px 0; color: #1e3a8a; font-size: 20px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
-                              Detalles de la Reserva
-                            </h2>
-                            <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">
-                              <tr>
-                                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; color: #6b7280; font-size: 14px; width: 140px;">
-                                  <strong>Fecha:</strong>
-                                </td>
-                                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; color: #1f2937; font-size: 14px;">
-                                  ${dateFormatted}
-                                </td>
-                              </tr>
-                              <tr>
-                                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; color: #6b7280; font-size: 14px;">
-                                  <strong>Sesión:</strong>
-                                </td>
-                                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; color: #1f2937; font-size: 14px;">
-                                  ${sessionLabel}
-                                </td>
-                              </tr>
-                              <tr>
-                                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; color: #6b7280; font-size: 14px;">
-                                  <strong>Pasajeros:</strong>
-                                </td>
-                                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; color: #1f2937; font-size: 14px;">
-                                  ${passengers}
-                                </td>
-                              </tr>
-                              ${message ? `
-                              <tr>
-                                <td style="padding: 12px 0; color: #6b7280; font-size: 14px; vertical-align: top;">
-                                  <strong>Mensaje:</strong>
-                                </td>
-                                <td style="padding: 12px 0; color: #1f2937; font-size: 14px; line-height: 1.6;">
-                                  ${message}
-                                </td>
-                              </tr>
-                              ` : ''}
-                            </table>
-                          </div>
-
-                          <!-- Action Button -->
-                          <div style="text-align: center; margin-top: 30px;">
-                            <a href="https://atlantischarters.com/admin"
-                               style="display: inline-block; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
-                              Ver Panel de Administración
-                            </a>
-                          </div>
-                        </td>
-                      </tr>
-
-                      <!-- Footer -->
-                      <tr>
-                        <td style="background-color: #f9fafb; padding: 20px 40px; text-align: center; border-top: 1px solid #e5e7eb;">
-                          <p style="margin: 0 0 5px 0; color: #6b7280; font-size: 12px;">
-                            ID Reserva: ${reservation.id}
-                          </p>
-                          <p style="margin: 0; color: #9ca3af; font-size: 11px;">
-                            Recibido: ${new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' })}
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </body>
-            </html>
+  <p style="text-align: center; color: #6B6860; font-size: 13px;">
+    Al confirmar, se creará automáticamente el evento en tu Google Calendar<br>
+    y el cliente recibirá un email de confirmación.
+  </p>
+</div>
           `
         })
       });
@@ -275,7 +158,8 @@ export default async function handler(req, res) {
     res.status(201).json({
       success: true,
       reservationId: reservation.id,
-      message: 'Reservation confirmed'
+      status: 'pending',
+      message: 'Reservation pending captain confirmation'
     });
 
   } catch (error) {
