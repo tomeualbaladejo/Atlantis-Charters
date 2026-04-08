@@ -9,6 +9,55 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
+// Generate JWT for Google Service Account
+async function getGoogleAccessToken() {
+  const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+  const now = Math.floor(Date.now() / 1000);
+
+  // Create JWT header and payload
+  const header = { alg: 'RS256', typ: 'JWT' };
+  const payload = {
+    iss: serviceAccountEmail,
+    scope: 'https://www.googleapis.com/auth/calendar',
+    aud: 'https://oauth2.googleapis.com/token',
+    exp: now + 3600,
+    iat: now
+  };
+
+  // Base64url encode
+  const base64url = (obj) => Buffer.from(JSON.stringify(obj))
+    .toString('base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+
+  const signingInput = `${base64url(header)}.${base64url(payload)}`;
+
+  // Sign with private key using Node.js crypto
+  const { createSign } = await import('crypto');
+  const sign = createSign('RSA-SHA256');
+  sign.update(signingInput);
+  const signature = sign.sign(privateKey, 'base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+
+  const jwt = `${signingInput}.${signature}`;
+
+  // Exchange JWT for access token
+  const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
+  });
+
+  const tokenData = await tokenResponse.json();
+  console.log('Token response:', JSON.stringify(tokenData));
+  return tokenData.access_token;
+}
+
 export default async function handler(req, res) {
   const { id, token } = req.query;
 
@@ -50,16 +99,56 @@ export default async function handler(req, res) {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     });
 
-    // NOTE: Google Calendar API with just an API key is READ-ONLY
-    // To write events we need OAuth2, which requires user authentication flow
-    // For now, we'll provide a Google Calendar "quick add" link below
-    // The captain can click it to add the event with all details pre-filled
+    // Create Google Calendar event via Service Account
+    let googleEventId = null;
+    try {
+      const accessToken = await getGoogleAccessToken();
+
+      if (accessToken) {
+        const calendarResponse = await fetch(
+          `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(process.env.GOOGLE_CALENDAR_ID)}/events`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              summary: `⛵ Atlantis — ${reservation.name} (${reservation.session === 'morning' ? 'Mañana' : 'Atardecer'})`,
+              description: `Reserva Atlantis Charters\n\nCliente: ${reservation.name}\nEmail: ${reservation.email}\nTeléfono: ${reservation.phone}\nPasajeros: ${reservation.passengers}${reservation.message ? `\nMensaje: ${reservation.message}` : ''}`,
+              start: {
+                dateTime: `${reservation.date}T${startTime}:00`,
+                timeZone: 'Europe/Madrid'
+              },
+              end: {
+                dateTime: `${reservation.date}T${endTime}:00`,
+                timeZone: 'Europe/Madrid'
+              },
+              location: 'W36Q+CH6, 07470 Port de Pollença, Illes Balears'
+            })
+          }
+        );
+
+        const calendarEvent = await calendarResponse.json();
+        console.log('Calendar event result:', JSON.stringify(calendarEvent));
+
+        if (calendarEvent.id) {
+          googleEventId = calendarEvent.id;
+          console.log('✅ Google Calendar event created:', googleEventId);
+        } else {
+          console.error('❌ Calendar event creation failed:', JSON.stringify(calendarEvent));
+        }
+      }
+    } catch(calErr) {
+      console.error('Calendar error:', calErr.message);
+    }
 
     // Update reservation status to confirmed
     const { error: updateError } = await supabase
       .from('reservations')
       .update({
-        status: 'confirmed'
+        status: 'confirmed',
+        google_event_id: googleEventId
       })
       .eq('id', id);
 
@@ -118,13 +207,6 @@ export default async function handler(req, res) {
       // Continue even if email fails
     }
 
-    // Build Google Calendar quick add URL
-    const calendarEventTitle = encodeURIComponent(`⛵ Atlantis — ${reservation.name} (${reservation.session === 'morning' ? 'Mañana' : 'Atardecer'})`);
-    const calendarDates = `${reservation.date.replace(/-/g, '')}T${startTime.replace(':', '')}00/${reservation.date.replace(/-/g, '')}T${endTime.replace(':', '')}00`;
-    const calendarDetails = encodeURIComponent(`Cliente: ${reservation.name}\nEmail: ${reservation.email}\nTeléfono: ${reservation.phone}\nPasajeros: ${reservation.passengers}${reservation.message ? `\nMensaje: ${reservation.message}` : ''}`);
-    const calendarLocation = encodeURIComponent('W36Q+CH6, 07470 Port de Pollença, Illes Balears');
-    const calendarUrl = `https://calendar.google.com/calendar/r/eventedit?text=${calendarEventTitle}&dates=${calendarDates}&details=${calendarDetails}&location=${calendarLocation}`;
-
     // Show success page to captain
     res.send(`
       <html>
@@ -138,9 +220,8 @@ export default async function handler(req, res) {
           p { color: #6B6860; line-height: 1.6; }
           .detail { background: #F5F0E8; border-radius: 12px; padding: 16px; margin: 20px 0; text-align: left; }
           .detail p { margin: 6px 0; font-size: 14px; }
+          .calendar-success { color: #2E7D32; font-size: 14px; margin: 20px 0; padding: 12px; background: #E8F5E9; border-radius: 8px; }
           a { display: inline-block; margin-top: 12px; background: #C85A4A; color: white; padding: 12px 32px; border-radius: 30px; text-decoration: none; font-size: 15px; }
-          a.calendar { background: #4285F4; margin-top: 12px; }
-          a.home { background: #6B6860; margin-top: 8px; }
         </style>
       </head>
       <body>
@@ -154,11 +235,8 @@ export default async function handler(req, res) {
             <p>⛵ ${sessionLabel}</p>
             <p>👥 ${reservation.passengers} pasajeros</p>
           </div>
-          <a href="${calendarUrl}" target="_blank" class="calendar">
-            📅 Añadir a Google Calendar
-          </a>
-          <br>
-          <a href="https://atlantis-charters.vercel.app/admin" class="home">Ver panel de administración</a>
+          ${googleEventId ? '<p class="calendar-success">✅ El evento ha sido añadido automáticamente a tu Google Calendar</p>' : '<p style="color: #FF6B6B; font-size: 13px;">⚠️ No se pudo crear el evento en Google Calendar automáticamente</p>'}
+          <a href="https://atlantis-charters.vercel.app/admin">Ver panel de administración</a>
         </div>
       </body>
       </html>
