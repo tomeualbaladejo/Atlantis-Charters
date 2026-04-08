@@ -22,6 +22,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  console.log('RESEND KEY:', process.env.RESEND_API_KEY ? 'EXISTS' : 'MISSING');
+  console.log('CAPTAIN EMAIL:', process.env.CAPTAIN_EMAIL || 'MISSING');
+
   console.log('ENV CHECK:', {
     hasResendKey: !!process.env.RESEND_API_KEY,
     hasCaptainEmail: !!process.env.CAPTAIN_EMAIL,
@@ -117,7 +120,7 @@ export default async function handler(req, res) {
 
     // Send notification email to captain
     try {
-      const captainEmailResponse = await fetch('https://api.resend.com/emails', {
+      const resendResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
@@ -125,78 +128,22 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           from: 'onboarding@resend.dev',
-          to: [process.env.CAPTAIN_EMAIL],
-          subject: `🆕 Nueva reserva — ${dateFormatted} · ${sessionLabel}`,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #f9f9f9;">
-              <h2 style="color: #C85A4A; margin-bottom: 24px;">🎯 Nueva reserva recibida</h2>
-
-              <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px;">
-                <table style="width: 100%; border-collapse: collapse;">
-                  <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 12px 0; color: #666; width: 120px;"><strong>Nombre</strong></td>
-                    <td style="padding: 12px 0;">${name}</td>
-                  </tr>
-                  <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 12px 0; color: #666;"><strong>Email</strong></td>
-                    <td style="padding: 12px 0;"><a href="mailto:${email}" style="color: #C85A4A;">${email}</a></td>
-                  </tr>
-                  <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 12px 0; color: #666;"><strong>Teléfono</strong></td>
-                    <td style="padding: 12px 0;"><a href="tel:${phone}" style="color: #C85A4A;">${phone}</a></td>
-                  </tr>
-                  <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 12px 0; color: #666;"><strong>Fecha</strong></td>
-                    <td style="padding: 12px 0; font-weight: bold;">${dateFormatted}</td>
-                  </tr>
-                  <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 12px 0; color: #666;"><strong>Sesión</strong></td>
-                    <td style="padding: 12px 0; font-weight: bold; color: #C85A4A;">${sessionLabel}</td>
-                  </tr>
-                  <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 12px 0; color: #666;"><strong>Pasajeros</strong></td>
-                    <td style="padding: 12px 0;">${passengers}</td>
-                  </tr>
-                  ${message ? `
-                  <tr>
-                    <td style="padding: 12px 0; color: #666; vertical-align: top;"><strong>Mensaje</strong></td>
-                    <td style="padding: 12px 0;">${message}</td>
-                  </tr>
-                  ` : ''}
-                </table>
-              </div>
-
-              <div style="background: #FFF3CD; border-left: 4px solid #FFC107; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                <p style="margin: 0; color: #856404;">
-                  <strong>⚠️ Nota:</strong> El cliente NO ha recibido email de confirmación automático.
-                  Por favor, contacta al cliente directamente para confirmar la reserva.
-                </p>
-              </div>
-
-              <div style="background: white; border-radius: 8px; padding: 16px;">
-                <p style="margin: 0 0 8px; color: #666; font-size: 13px;">
-                  <strong>ID de reserva:</strong> ${reservation.id}<br>
-                  <strong>Creada:</strong> ${new Date().toLocaleString('es-ES')}
-                </p>
-                <p style="margin: 8px 0 0; font-size: 13px;">
-                  <a href="https://atlantis-charters.vercel.app/admin" style="color: #C85A4A;">
-                    Ver en panel de administración →
-                  </a>
-                </p>
-              </div>
-            </div>
-          `
+          to: ['tomeualbaladejo@gmail.com'],
+          subject: `🆕 Nueva reserva Atlantis — ${date}`,
+          html: `<p>Nueva reserva de <strong>${name}</strong><br>
+                 Email: ${email}<br>
+                 Teléfono: ${phone}<br>
+                 Fecha: ${date}<br>
+                 Sesión: ${session}<br>
+                 Pasajeros: ${passengers}<br>
+                 Mensaje: ${message || 'Sin mensaje'}</p>`
         })
       });
-      const captainEmailResult = await captainEmailResponse.json();
-      console.log('Captain email result:', JSON.stringify(captainEmailResult));
-
-      if (captainEmailResult.statusCode && captainEmailResult.statusCode !== 200) {
-        console.error('Captain email failed:', captainEmailResult);
-      }
-    } catch (emailError) {
-      console.error('Captain email error:', emailError);
-      // Don't fail the reservation if email fails
+      const resendResult = await resendResponse.json();
+      console.log('RESEND RESPONSE STATUS:', resendResponse.status);
+      console.log('RESEND RESULT:', JSON.stringify(resendResult));
+    } catch(emailError) {
+      console.error('RESEND ERROR:', emailError.message);
     }
 
     res.status(201).json({
