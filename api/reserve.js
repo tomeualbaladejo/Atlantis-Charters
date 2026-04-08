@@ -22,6 +22,13 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  console.log('ENV CHECK:', {
+    hasResendKey: !!process.env.RESEND_API_KEY,
+    hasCaptainEmail: !!process.env.CAPTAIN_EMAIL,
+    captainEmail: process.env.CAPTAIN_EMAIL,
+    hasSupabaseUrl: !!process.env.SUPABASE_URL
+  });
+
   console.log('Reserve API called with:', JSON.stringify(req.body));
 
   const { date, session, name, email, phone, passengers, message } = req.body;
