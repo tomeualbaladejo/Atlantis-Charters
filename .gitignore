@@ -5,3 +5,4 @@ dist/images/.DS_Store
 .vercel
 .env.local
 .env*.local
+.env.production
