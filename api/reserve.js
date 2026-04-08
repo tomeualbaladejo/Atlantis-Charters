@@ -103,14 +103,14 @@ export default async function handler(req, res) {
 
     // Send confirmation email to client
     try {
-      await fetch('https://api.resend.com/emails', {
+      const clientEmailRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'Atlantis Charters <reservas@atlantis-charters.vercel.app>',
+          from: 'Atlantis Charters <onboarding@resend.dev>',
           to: [email],
           subject: `✅ Reserva confirmada — Atlantis Charters`,
           html: `
@@ -162,6 +162,9 @@ export default async function handler(req, res) {
           `
         })
       });
+
+      const clientEmailResult = await clientEmailRes.json();
+      console.log('Client email result:', JSON.stringify(clientEmailResult));
     } catch (emailError) {
       console.error('Client email error:', emailError);
       // Don't fail the reservation if email fails
@@ -169,14 +172,14 @@ export default async function handler(req, res) {
 
     // Send notification email to captain
     try {
-      await fetch('https://api.resend.com/emails', {
+      const captainEmailRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'Atlantis Reservas <reservas@atlantis-charters.vercel.app>',
+          from: 'Atlantis Charters <onboarding@resend.dev>',
           to: [process.env.CAPTAIN_EMAIL],
           subject: `🆕 Nueva reserva — ${dateFormatted} · ${sessionLabel}`,
           html: `
@@ -225,6 +228,9 @@ export default async function handler(req, res) {
           `
         })
       });
+
+      const captainEmailResult = await captainEmailRes.json();
+      console.log('Captain email result:', JSON.stringify(captainEmailResult));
     } catch (emailError) {
       console.error('Captain email error:', emailError);
       // Don't fail the reservation if email fails
