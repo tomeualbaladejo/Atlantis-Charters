@@ -64,9 +64,6 @@ export default function Home() {
   const location    = useLocation()
   const reservarRef = useRef(null)
 
-  const [pax,      setPax]      = useState('')
-  const [duration, setDuration] = useState('')
-
   useEffect(() => {
     document.title = 'Atlantis Charters | Alquiler de Barco en Port de Pollença, Mallorca'
     document.querySelector('meta[name="description"]')?.setAttribute('content', 'Vive una experiencia única a bordo de nuestro llaut mallorquín tradicional. Excursiones por el norte de Mallorca con snorkel, tapas y rincones secretos. Reserva ahora.')
@@ -87,14 +84,7 @@ export default function Home() {
   }, [location.search, openBooking])
 
   const handleOpenBooking = () => {
-    // Map duration value to session type
-    const durationMap = {
-      [t('book.dur.morning')]: 'morning',
-      [t('book.dur.afternoon')]: 'sunset',
-      [t('book.dur.full')]: '',
-      [t('book.dur.sunset')]: 'sunset',
-    }
-    openBooking(durationMap[duration] || '')
+    openBooking()
   }
 
   return (
@@ -148,36 +138,13 @@ export default function Home() {
           </motion.p>
 
           <motion.div
-            className="booking-bar"
-            role="search"
-            aria-label="Consulta rápida"
+            className="booking-bar-simple"
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.75 }}
           >
-            <div className="bfield">
-              <label htmlFor="hPax">{t('book.pax')}</label>
-              <select id="hPax" value={pax} onChange={e => setPax(e.target.value)}>
-                <option value="">{t('book.select')}</option>
-                {[...Array(12)].map((_, i) => (
-                  <option key={i+1} value={String(i+1)}>
-                    {i+1} {i === 0 ? t('book.pax.person') : t('book.pax.plural')}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="bfield">
-              <label htmlFor="hDur">{t('book.dur')}</label>
-              <select id="hDur" value={duration} onChange={e => setDuration(e.target.value)}>
-                <option value="">{t('book.select')}</option>
-                <option value={t('book.dur.morning')}>{t('book.dur.morning')}</option>
-                <option value={t('book.dur.afternoon')}>{t('book.dur.afternoon')}</option>
-                <option value={t('book.dur.full')}>{t('book.dur.full')}</option>
-                <option value={t('book.dur.sunset')}>{t('book.dur.sunset')}</option>
-              </select>
-            </div>
-            <button className="booking-cta-btn" onClick={handleOpenBooking} type="button">
-              {t('book.cta')}
+            <button className="booking-cta-btn-full" onClick={handleOpenBooking} type="button">
+              {t('hero.availability')} →
             </button>
           </motion.div>
         </div>

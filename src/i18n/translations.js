@@ -11,6 +11,7 @@ export const translations = {
     'hero.tag': 'Mallorca\u00a0·\u00a0Mediterráneo',
     'hero.h1':  'Navega como en casa',
     'hero.sub': 'Experiencias únicas a bordo de un llaut mallorquín tradicional',
+    'hero.availability': 'Ver disponibilidad',
 
     // Booking bar
     'book.pax':        'Pasajeros',
@@ -210,6 +211,7 @@ export const translations = {
     'hero.tag': 'Mallorca\u00a0·\u00a0Mediterranean',
     'hero.h1':  'Sail like a local',
     'hero.sub': 'Unique experiences aboard a traditional Mallorcan fishing boat',
+    'hero.availability': 'Check availability',
 
     'book.pax':        'Passengers',
     'book.dur':        'Duration',
@@ -400,6 +402,7 @@ export const translations = {
     'hero.tag': 'Mallorca\u00a0·\u00a0Mittelmeer',
     'hero.h1':  'Segeln wie ein Einheimischer',
     'hero.sub': 'Einzigartige Erlebnisse an Bord eines traditionellen mallorquinischen Fischerboots',
+    'hero.availability': 'Verfügbarkeit prüfen',
 
     'book.pax':        'Passagiere',
     'book.dur':        'Dauer',
@@ -590,6 +593,7 @@ export const translations = {
     'hero.tag': 'Majorque\u00a0·\u00a0Méditerranée',
     'hero.h1':  'Naviguez comme chez vous',
     'hero.sub': "Expériences uniques à bord d'un bateau traditionnel majorquin",
+    'hero.availability': 'Voir disponibilité',
 
     'book.pax':        'Passagers',
     'book.dur':        'Durée',
