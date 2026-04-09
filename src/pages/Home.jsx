@@ -3,8 +3,8 @@ import { useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import BookingWidget from '../components/BookingWidget'
 import { useLanguage } from '../contexts/LanguageContext'
+import { useBooking } from '../contexts/BookingContext'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -60,13 +60,12 @@ const REVIEWS = [
 /* ── Home page ── */
 export default function Home() {
   const { t } = useLanguage()
+  const { openBooking } = useBooking()
   const location    = useLocation()
   const reservarRef = useRef(null)
 
   const [pax,      setPax]      = useState('')
   const [duration, setDuration] = useState('')
-  const [bookingOpen, setBookingOpen] = useState(false)
-  const [initialSession, setInitialSession] = useState('')
 
   useEffect(() => {
     document.title = 'Atlantis Charters | Alquiler de Barco en Port de Pollença, Mallorca'
@@ -80,7 +79,14 @@ export default function Home() {
     }
   }, [location.hash])
 
-  const openBooking = () => {
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    if (params.get('booking') === 'open') {
+      openBooking()
+    }
+  }, [location.search, openBooking])
+
+  const handleOpenBooking = () => {
     // Map duration value to session type
     const durationMap = {
       [t('book.dur.morning')]: 'morning',
@@ -88,8 +94,7 @@ export default function Home() {
       [t('book.dur.full')]: '',
       [t('book.dur.sunset')]: 'sunset',
     }
-    setInitialSession(durationMap[duration] || '')
-    setBookingOpen(true)
+    openBooking(durationMap[duration] || '')
   }
 
   return (
@@ -101,13 +106,6 @@ export default function Home() {
       transition={{ duration: 0.35 }}
     >
       <Navbar />
-
-      {/* ── BOOKING WIDGET ── */}
-      <BookingWidget
-        isOpen={bookingOpen}
-        onClose={() => setBookingOpen(false)}
-        initialSession={initialSession}
-      />
 
       {/* ── HERO ── */}
       <section id="inicio" className="hero" aria-label="Portada">
@@ -178,7 +176,7 @@ export default function Home() {
                 <option value={t('book.dur.sunset')}>{t('book.dur.sunset')}</option>
               </select>
             </div>
-            <button className="booking-cta-btn" onClick={openBooking} type="button">
+            <button className="booking-cta-btn" onClick={handleOpenBooking} type="button">
               {t('book.cta')}
             </button>
           </motion.div>

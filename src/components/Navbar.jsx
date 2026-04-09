@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '../contexts/LanguageContext'
+import { useBooking } from '../contexts/BookingContext'
 
 /* ── SVG Flag components ── */
 function FlagES() {
@@ -107,6 +108,7 @@ function LangSelector() {
 
 export default function Navbar() {
   const { t } = useLanguage()
+  const { openBooking } = useBooking()
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
@@ -119,10 +121,9 @@ export default function Navbar() {
   const goReservar = () => {
     setMenuOpen(false)
     if (location.pathname === '/') {
-      document.getElementById('reservar')?.scrollIntoView({ behavior: 'smooth' })
+      openBooking()
     } else {
-      navigate('/')
-      setTimeout(() => document.getElementById('reservar')?.scrollIntoView({ behavior: 'smooth' }), 150)
+      navigate('/?booking=open')
     }
   }
 
