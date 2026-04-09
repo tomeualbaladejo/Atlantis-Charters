@@ -158,18 +158,7 @@ export default async function handler(req, res) {
     }
 
     // Send confirmation email to CLIENT
-    try {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          from: 'onboarding@resend.dev',
-          to: ['tomeualbaladejo@gmail.com'], // Test mode — change to reservation.email when domain verified
-          subject: `✅ ¡Tu reserva está confirmada! — Atlantis Charters`,
-          html: `
+    const confirmationEmailHtml = `
 <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
   <div style="text-align: center; margin-bottom: 32px;">
     <h1 style="color: #C85A4A; font-size: 28px; margin: 0;">ATLANTIS CHARTERS</h1>
@@ -198,12 +187,57 @@ export default async function handler(req, res) {
 
   <p style="text-align: center; color: #6B6860; font-size: 13px;">© 2025 Atlantis Charters · Port de Pollença, Mallorca</p>
 </div>
-          `
+    `;
+
+    try {
+      const clientEmailRes = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'onboarding@resend.dev',
+          to: [reservation.email],
+          subject: `✅ ¡Tu reserva está confirmada! — Atlantis Charters`,
+          html: confirmationEmailHtml
         })
       });
-      console.log('Client confirmation email sent');
+      const clientResult = await clientEmailRes.json();
+      console.log('Client email result:', JSON.stringify(clientResult));
+
+      // If failed (test mode), send to captain as backup with client details
+      if (clientResult.statusCode === 403 || clientEmailRes.status !== 200) {
+        console.log('⚠️ Client email failed in test mode, sending to captain instead');
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: 'onboarding@resend.dev',
+            to: ['tomeualbaladejo@gmail.com'],
+            subject: `📋 REENVIAR AL CLIENTE: Confirmación para ${reservation.name} (${reservation.email})`,
+            html: `
+<div style="background: #FFF3CD; border-left: 4px solid #FFA500; padding: 20px; margin-bottom: 20px;">
+  <p style="margin: 0; font-weight: bold; color: #856404;">⚠️ MODO TEST</p>
+  <p style="margin: 10px 0 0 0; color: #856404;">
+    Este email debería ir a <strong>${reservation.email}</strong><br>
+    Por favor reenvíaselo manualmente hasta que se verifique el dominio en Resend.
+  </p>
+</div>
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+${confirmationEmailHtml}
+            `
+          })
+        });
+        console.log('✅ Backup email sent to captain');
+      } else {
+        console.log('✅ Client confirmation email sent successfully');
+      }
     } catch (emailError) {
-      console.error('Client email error:', emailError);
+      console.error('Client email error:', emailError.message);
       // Continue even if email fails
     }
 
