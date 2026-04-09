@@ -174,7 +174,8 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
     setSubmitting(true)
 
     try {
-      const res = await fetch(`${API_BASE}/reserve`, {
+      // Create payment session (Stripe Checkout)
+      const res = await fetch(`${API_BASE}/create-payment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -191,16 +192,23 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || 'Reservation failed')
+        if (res.status === 409) {
+          setError(t('booking.error.slotTaken'))
+        } else {
+          throw new Error(data.error || 'Payment session creation failed')
+        }
+        return
       }
 
-      setReservationId(data.reservationId)
-      setStep('success')
+      // Redirect to Stripe Checkout
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl
+      } else {
+        throw new Error('No checkout URL received')
+      }
     } catch (err) {
-      setError(err.message === 'This slot is already booked'
-        ? t('booking.error.slotTaken')
-        : t('booking.error.generic'))
-    } finally {
+      console.error('Booking error:', err)
+      setError(t('booking.error.generic'))
       setSubmitting(false)
     }
   }
@@ -463,7 +471,11 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
             className="booking-submit-btn"
             disabled={submitting}
           >
-            {submitting ? t('booking.submitting') : t('booking.submit')}
+            {submitting ? t('booking.submitting') : (() => {
+              const deposits = { morning: 104, afternoon: 104, sunset: 70, fullday: 124 }
+              const deposit = deposits[selectedSession] || 104
+              return `${t('booking.submit')} (${deposit}€)`
+            })()}
           </button>
 
           <p className="booking-privacy">{t('booking.privacy')}</p>
