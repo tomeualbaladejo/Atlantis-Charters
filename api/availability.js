@@ -58,11 +58,15 @@ export default async function handler(req, res) {
       }
 
       const title = (event.summary || '').toLowerCase();
-      const startHour = new Date(event.start.dateTime).getHours();
-      const startMinutes = new Date(event.start.dateTime).getMinutes();
+
+      // Parse time directly from dateTime string to avoid timezone issues
+      // Format: "2026-04-13T14:30:00+02:00"
+      const timeMatch = event.start.dateTime.match(/T(\d{2}):(\d{2})/);
+      const startHour = timeMatch ? parseInt(timeMatch[1]) : 0;
+      const startMinutes = timeMatch ? parseInt(timeMatch[2]) : 0;
       const startDecimal = startHour + startMinutes / 60;
 
-      console.log(`[${date}] Event: "${event.summary}" at ${startHour}:${startMinutes.toString().padStart(2, '0')} (${startDecimal})`);
+      console.log(`[${date}] Event: "${event.summary || '(no title)'}" at ${startHour}:${startMinutes.toString().padStart(2, '0')} (${startDecimal})`);
 
       // Check title keywords - order matters!
       const isFullDay = title.includes('día completo') || title.includes('dia completo') ||
