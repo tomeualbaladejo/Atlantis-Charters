@@ -316,7 +316,6 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
             onClick={() => handleSessionSelect('morning')}
             disabled={!morningAvailable}
           >
-            <span className="booking-session-icon">&#9728;</span>
             <span className="booking-session-name">{t('booking.session.morning')}</span>
             <span className="booking-session-time">10:00 - 14:00</span>
             {!morningAvailable && <span className="booking-session-status">{t('booking.booked')}</span>}
@@ -327,7 +326,6 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
             onClick={() => handleSessionSelect('sunset')}
             disabled={!sunsetAvailable}
           >
-            <span className="booking-session-icon">&#127749;</span>
             <span className="booking-session-name">{t('booking.session.sunset')}</span>
             <span className="booking-session-time">16:00 - 20:00</span>
             {!sunsetAvailable && <span className="booking-session-status">{t('booking.booked')}</span>}
@@ -465,7 +463,6 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
 
     return (
       <div className="booking-success">
-        <div className="booking-success-icon">&#9989;</div>
         <h3>{t('booking.success.title')}</h3>
         <p>{t('booking.success.subtitle')}</p>
 
