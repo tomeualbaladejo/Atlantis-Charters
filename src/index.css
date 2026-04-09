@@ -1818,6 +1818,19 @@ button, input, select, textarea { font-family: var(--font-body); }
   .calendly-card {
     padding: 20px 16px;
   }
+  .booking-session-options {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .booking-session-btn {
+    padding: 14px 10px;
+  }
+  .booking-session-name {
+    font-size: 13px;
+  }
+  .booking-session-time {
+    font-size: 11px;
+  }
 }
 
 /* ============================================================
@@ -2332,13 +2345,13 @@ button, input, select, textarea { font-family: var(--font-body); }
 }
 
 .booking-session-options {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   margin-bottom: 20px;
 }
 
 .booking-session-btn {
-  flex: 1;
   background: var(--sand);
   border: 2px solid transparent;
   border-radius: 12px;
@@ -2350,6 +2363,7 @@ button, input, select, textarea { font-family: var(--font-body); }
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  min-width: 0;
 }
 
 .booking-session-btn:hover:not(:disabled) {
