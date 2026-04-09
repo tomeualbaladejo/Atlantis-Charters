@@ -46,68 +46,53 @@ export default async function handler(req, res) {
       const date = event.start.date || event.start.dateTime?.split('T')[0];
       if (!date) return;
 
-      if (!bookedSlots[date]) {
-        bookedSlots[date] = { morning: false, afternoon: false, sunset: false };
+      if (!bookedSlots[date]) bookedSlots[date] = { morning: false, afternoon: false, sunset: false };
+
+      // All-day event — block everything
+      if (event.start.date && !event.start.dateTime) {
+        bookedSlots[date].morning = true;
+        bookedSlots[date].afternoon = true;
+        bookedSlots[date].sunset = true;
+        return;
       }
 
       const title = (event.summary || '').toLowerCase();
+      const startHour = new Date(event.start.dateTime).getHours();
+      const startMinutes = new Date(event.start.dateTime).getMinutes();
+      const startDecimal = startHour + startMinutes / 60;
 
-      // Check event start time to determine session
-      let startHour = null;
-      let startMinute = null;
-      if (event.start.dateTime) {
-        const startTime = new Date(event.start.dateTime);
-        startHour = startTime.getHours();
-        startMinute = startTime.getMinutes();
-      }
-
-      // Determine session from title keywords first
-      const isMorningTitle = title.includes('medio día mañana') ||
-                             title.includes('mañana') ||
-                             title.includes('morning') ||
-                             title.includes('manana');
-      const isAfternoonTitle = title.includes('medio día tarde') ||
-                               title.includes('tarde') ||
-                               title.includes('afternoon');
-      const isSunsetTitle = title.includes('atardecer') || title.includes('sunset');
-      const isFullDay = title.includes('día completo') ||
-                        title.includes('dia completo') ||
-                        title.includes('completo') ||
-                        title.includes('full');
+      const isMorning = title.includes('mañana') || title.includes('morning');
+      const isAfternoon = title.includes('tarde') || title.includes('afternoon');
+      const isSunset = title.includes('atardecer') || title.includes('sunset');
+      const isFullDay = title.includes('completo') || title.includes('full') || title.includes('fullday');
 
       if (isFullDay) {
-        // Full day blocks all sessions
         bookedSlots[date].morning = true;
         bookedSlots[date].afternoon = true;
         bookedSlots[date].sunset = true;
-      } else if (isMorningTitle) {
+      } else if (isMorning) {
         bookedSlots[date].morning = true;
-      } else if (isAfternoonTitle) {
+      } else if (isAfternoon) {
         bookedSlots[date].afternoon = true;
-      } else if (isSunsetTitle) {
+      } else if (isSunset) {
         bookedSlots[date].sunset = true;
-      } else if (startHour !== null) {
-        // Use start time to determine session
-        if (startHour >= 10 && startHour < 13) {
-          // Morning: 10:00 - 14:00
-          bookedSlots[date].morning = true;
-        } else if (startHour >= 14 && startHour < 19) {
-          // Afternoon: 14:30 - 18:00
-          bookedSlots[date].afternoon = true;
-        } else if (startHour >= 19) {
-          // Sunset: 19:00 - 21:30
+      } else {
+        // Fallback: use start time
+        // morning: 10:00-14:00 → starts around 10
+        // afternoon: 14:30-18:00 → starts around 14-15
+        // sunset: 19:00-21:30 → starts around 19
+        if (startDecimal >= 19) {
           bookedSlots[date].sunset = true;
+        } else if (startDecimal >= 14) {
+          bookedSlots[date].afternoon = true;
+        } else if (startDecimal >= 10) {
+          bookedSlots[date].morning = true;
         } else {
           // Unknown time — block all to be safe
           bookedSlots[date].morning = true;
           bookedSlots[date].afternoon = true;
           bookedSlots[date].sunset = true;
         }
-      } else {
-        // All-day event or unknown — block all to be safe
-        bookedSlots[date].morning = true;
-        bookedSlots[date].afternoon = true;
-        bookedSlots[date].sunset = true;
       }
     });
 
