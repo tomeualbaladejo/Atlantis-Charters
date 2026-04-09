@@ -93,16 +93,16 @@ export default async function handler(req, res) {
     // Format session details for emails
     const sessionLabels = {
       morning: 'Medio día mañana (10:00 - 14:00)',
-      afternoon: 'Medio día tarde (14:30 - 18:00)',
+      afternoon: 'Medio día tarde (14:30 - 18:30)',
       sunset: 'Atardecer (19:00 - 21:30)',
-      fullday: 'Día completo (10:00 - 20:30)'
+      fullday: 'Día completo (14:30 - 20:30)'
     };
 
     const sessionLabelsEN = {
       morning: 'Morning (10:00 - 14:00)',
-      afternoon: 'Afternoon (14:30 - 18:00)',
+      afternoon: 'Afternoon (14:30 - 18:30)',
       sunset: 'Sunset (19:00 - 21:30)',
-      fullday: 'Full day (10:00 - 20:30)'
+      fullday: 'Full day (14:30 - 20:30)'
     };
 
     const sessionLabel = sessionLabels[session] || sessionLabels.morning;

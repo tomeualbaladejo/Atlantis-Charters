@@ -90,16 +90,16 @@ export default async function handler(req, res) {
     // Session details
     const sessionLabels = {
       morning: 'Medio día mañana (10:00 - 14:00)',
-      afternoon: 'Medio día tarde (14:30 - 18:00)',
+      afternoon: 'Medio día tarde (14:30 - 18:30)',
       sunset: 'Atardecer (19:00 - 21:30)',
-      fullday: 'Día completo (10:00 - 20:30)'
+      fullday: 'Día completo (14:30 - 20:30)'
     };
 
     const sessionTimes = {
       morning: { start: '10:00', end: '14:00' },
-      afternoon: { start: '14:30', end: '18:00' },
+      afternoon: { start: '14:30', end: '18:30' },
       sunset: { start: '19:00', end: '21:30' },
-      fullday: { start: '10:00', end: '20:30' }
+      fullday: { start: '14:30', end: '20:30' }
     };
 
     const sessionLabel = sessionLabels[reservation.session] || sessionLabels.morning;

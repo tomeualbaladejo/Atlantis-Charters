@@ -53,6 +53,7 @@ export default async function handler(req, res) {
         bookedSlots[date].morning = true;
         bookedSlots[date].afternoon = true;
         bookedSlots[date].sunset = true;
+        console.log(`[${date}] All-day event: ${event.summary}`);
         return;
       }
 
@@ -61,37 +62,51 @@ export default async function handler(req, res) {
       const startMinutes = new Date(event.start.dateTime).getMinutes();
       const startDecimal = startHour + startMinutes / 60;
 
-      const isMorning = title.includes('mañana') || title.includes('morning');
-      const isAfternoon = title.includes('tarde') || title.includes('afternoon');
+      console.log(`[${date}] Event: "${event.summary}" at ${startHour}:${startMinutes.toString().padStart(2, '0')} (${startDecimal})`);
+
+      // Check title keywords - order matters!
+      const isFullDay = title.includes('día completo') || title.includes('dia completo') ||
+                        title.includes('completo') || title.includes('full day') ||
+                        title.includes('fullday');
+      const isMorning = title.includes('medio día mañana') || title.includes('medio dia mañana') ||
+                       title.includes('mañana') || title.includes('morning');
+      const isAfternoon = title.includes('medio día tarde') || title.includes('medio dia tarde') ||
+                         title.includes('tarde') || title.includes('afternoon');
       const isSunset = title.includes('atardecer') || title.includes('sunset');
-      const isFullDay = title.includes('completo') || title.includes('full') || title.includes('fullday');
+
+      console.log(`  Keywords: fullday=${isFullDay}, morning=${isMorning}, afternoon=${isAfternoon}, sunset=${isSunset}`);
 
       if (isFullDay) {
-        bookedSlots[date].morning = true;
+        // Full day only blocks afternoon + sunset (NOT morning)
         bookedSlots[date].afternoon = true;
         bookedSlots[date].sunset = true;
+        console.log(`  → Blocked: afternoon, sunset (fullday)`);
       } else if (isMorning) {
         bookedSlots[date].morning = true;
+        console.log(`  → Blocked: morning`);
       } else if (isAfternoon) {
         bookedSlots[date].afternoon = true;
+        console.log(`  → Blocked: afternoon`);
       } else if (isSunset) {
         bookedSlots[date].sunset = true;
+        console.log(`  → Blocked: sunset`);
       } else {
         // Fallback: use start time
-        // morning: 10:00-14:00 → starts around 10
-        // afternoon: 14:30-18:00 → starts around 14-15
-        // sunset: 19:00-21:30 → starts around 19
         if (startDecimal >= 19) {
           bookedSlots[date].sunset = true;
+          console.log(`  → Blocked: sunset (by time ${startDecimal})`);
         } else if (startDecimal >= 14) {
           bookedSlots[date].afternoon = true;
+          console.log(`  → Blocked: afternoon (by time ${startDecimal})`);
         } else if (startDecimal >= 10) {
           bookedSlots[date].morning = true;
+          console.log(`  → Blocked: morning (by time ${startDecimal})`);
         } else {
           // Unknown time — block all to be safe
           bookedSlots[date].morning = true;
           bookedSlots[date].afternoon = true;
           bookedSlots[date].sunset = true;
+          console.log(`  → Blocked: ALL (unknown time ${startDecimal})`);
         }
       }
     });
