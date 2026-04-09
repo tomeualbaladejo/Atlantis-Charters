@@ -26,6 +26,16 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  // Verify environment variables
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.error('Missing STRIPE_SECRET_KEY');
+    return res.status(500).json({ error: 'Server configuration error: Missing Stripe key' });
+  }
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+    console.error('Missing Supabase credentials');
+    return res.status(500).json({ error: 'Server configuration error: Missing database credentials' });
+  }
+
   const { date, session, name, email, phone, passengers, message } = req.body;
 
   // Validate required fields
@@ -127,6 +137,9 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Create payment error:', error);
-    res.status(500).json({ error: 'Failed to create payment session' });
+    res.status(500).json({
+      error: 'Failed to create payment session',
+      details: error.message
+    });
   }
 }
