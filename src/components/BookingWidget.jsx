@@ -466,15 +466,24 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
 
           {error && <p className="booking-error">{error}</p>}
 
+          <div className="booking-payment-info">
+            <p className="booking-deposit-text">{t('booking.depositInfo')}</p>
+          </div>
+
           <button
             type="submit"
             className="booking-submit-btn"
             disabled={submitting}
           >
             {submitting ? t('booking.submitting') : (() => {
-              const deposits = { morning: 104, afternoon: 104, sunset: 70, fullday: 124 }
-              const deposit = deposits[selectedSession] || 104
-              return `${t('booking.submit')} (${deposit}€)`
+              const prices = {
+                morning: { deposit: 104, total: 520 },
+                afternoon: { deposit: 104, total: 520 },
+                sunset: { deposit: 70, total: 350 },
+                fullday: { deposit: 124, total: 620 }
+              }
+              const price = prices[selectedSession] || { deposit: 104, total: 520 }
+              return `${t('booking.submit')} — ${price.deposit}€ / ${price.total}€`
             })()}
           </button>
 
