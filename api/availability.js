@@ -46,46 +46,67 @@ export default async function handler(req, res) {
       const date = event.start.date || event.start.dateTime?.split('T')[0];
       if (!date) return;
 
-      if (!bookedSlots[date]) bookedSlots[date] = { morning: false, sunset: false };
+      if (!bookedSlots[date]) {
+        bookedSlots[date] = { morning: false, afternoon: false, sunset: false };
+      }
 
       const title = (event.summary || '').toLowerCase();
 
       // Check event start time to determine session
       let startHour = null;
+      let startMinute = null;
       if (event.start.dateTime) {
-        // Parse the hour from dateTime (format: 2026-04-19T09:00:00+02:00)
         const startTime = new Date(event.start.dateTime);
         startHour = startTime.getHours();
+        startMinute = startTime.getMinutes();
       }
 
       // Determine session from title keywords first
-      const isMorningTitle = title.includes('mañana') || title.includes('morning') ||
+      const isMorningTitle = title.includes('medio día mañana') ||
+                             title.includes('mañana') ||
+                             title.includes('morning') ||
                              title.includes('manana');
-      const isSunsetTitle = title.includes('atardecer') || title.includes('sunset') ||
-                            title.includes('tarde');
-      const isFullDay = title.includes('completo') || title.includes('full') ||
-                        title.includes('día completo');
+      const isAfternoonTitle = title.includes('medio día tarde') ||
+                               title.includes('tarde') ||
+                               title.includes('afternoon');
+      const isSunsetTitle = title.includes('atardecer') || title.includes('sunset');
+      const isFullDay = title.includes('día completo') ||
+                        title.includes('dia completo') ||
+                        title.includes('completo') ||
+                        title.includes('full');
 
       if (isFullDay) {
-        // Full day blocks both
+        // Full day blocks all sessions
         bookedSlots[date].morning = true;
+        bookedSlots[date].afternoon = true;
         bookedSlots[date].sunset = true;
       } else if (isMorningTitle) {
         bookedSlots[date].morning = true;
+      } else if (isAfternoonTitle) {
+        bookedSlots[date].afternoon = true;
       } else if (isSunsetTitle) {
         bookedSlots[date].sunset = true;
       } else if (startHour !== null) {
         // Use start time to determine session
-        if (startHour < 14) {
-          // Starts before 2pm = morning session (10:00-14:00)
+        if (startHour >= 10 && startHour < 13) {
+          // Morning: 10:00 - 14:00
           bookedSlots[date].morning = true;
+        } else if (startHour >= 14 && startHour < 19) {
+          // Afternoon: 14:30 - 18:00
+          bookedSlots[date].afternoon = true;
+        } else if (startHour >= 19) {
+          // Sunset: 19:00 - 21:30
+          bookedSlots[date].sunset = true;
         } else {
-          // Starts at 2pm or later = sunset session (16:00-20:00)
+          // Unknown time — block all to be safe
+          bookedSlots[date].morning = true;
+          bookedSlots[date].afternoon = true;
           bookedSlots[date].sunset = true;
         }
       } else {
-        // All-day event or unknown — block both to be safe
+        // All-day event or unknown — block all to be safe
         bookedSlots[date].morning = true;
+        bookedSlots[date].afternoon = true;
         bookedSlots[date].sunset = true;
       }
     });

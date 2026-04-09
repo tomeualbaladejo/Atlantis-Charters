@@ -111,7 +111,13 @@ export default function Admin() {
   }
 
   const formatSession = (session) => {
-    return session === 'morning' ? 'Mañana (10:00-14:00)' : 'Atardecer (16:00-20:00)'
+    const sessions = {
+      morning: 'Mañana (10:00-14:00)',
+      afternoon: 'Tarde (14:30-18:00)',
+      sunset: 'Atardecer (19:00-21:30)',
+      fullday: 'Día completo (10:00-20:30)'
+    }
+    return sessions[session] || sessions.morning
   }
 
   // Login screen

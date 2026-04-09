@@ -298,6 +298,7 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
 
     const slots = bookedSlots[selectedDate] || {}
     const morningAvailable = !slots.morning
+    const afternoonAvailable = !slots.afternoon
     const sunsetAvailable = !slots.sunset
 
     const dateFormatted = new Date(selectedDate + 'T00:00:00').toLocaleDateString(
@@ -322,13 +323,33 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
           </button>
 
           <button
+            className={`booking-session-btn ${selectedSession === 'afternoon' ? 'booking-session-btn--selected' : ''} ${!afternoonAvailable ? 'booking-session-btn--disabled' : ''}`}
+            onClick={() => handleSessionSelect('afternoon')}
+            disabled={!afternoonAvailable}
+          >
+            <span className="booking-session-name">{t('booking.session.afternoon')}</span>
+            <span className="booking-session-time">14:30 - 18:00</span>
+            {!afternoonAvailable && <span className="booking-session-status">{t('booking.booked')}</span>}
+          </button>
+
+          <button
             className={`booking-session-btn ${selectedSession === 'sunset' ? 'booking-session-btn--selected' : ''} ${!sunsetAvailable ? 'booking-session-btn--disabled' : ''}`}
             onClick={() => handleSessionSelect('sunset')}
             disabled={!sunsetAvailable}
           >
             <span className="booking-session-name">{t('booking.session.sunset')}</span>
-            <span className="booking-session-time">16:00 - 20:00</span>
+            <span className="booking-session-time">19:00 - 21:30</span>
             {!sunsetAvailable && <span className="booking-session-status">{t('booking.booked')}</span>}
+          </button>
+
+          <button
+            className={`booking-session-btn ${selectedSession === 'fullday' ? 'booking-session-btn--selected' : ''} ${!morningAvailable || !afternoonAvailable || !sunsetAvailable ? 'booking-session-btn--disabled' : ''}`}
+            onClick={() => handleSessionSelect('fullday')}
+            disabled={!morningAvailable || !afternoonAvailable || !sunsetAvailable}
+          >
+            <span className="booking-session-name">{t('booking.session.fullday')}</span>
+            <span className="booking-session-time">10:00 - 20:30</span>
+            {(!morningAvailable || !afternoonAvailable || !sunsetAvailable) && <span className="booking-session-status">{t('booking.booked')}</span>}
           </button>
         </div>
 
@@ -457,9 +478,13 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
       lang === 'es' ? 'es-ES' : 'en-US',
       { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
     )
-    const sessionLabel = selectedSession === 'morning'
-      ? `${t('booking.session.morning')} (10:00 - 14:00)`
-      : `${t('booking.session.sunset')} (16:00 - 20:00)`
+    const sessionLabels = {
+      morning: `${t('booking.session.morning')} (10:00 - 14:00)`,
+      afternoon: `${t('booking.session.afternoon')} (14:30 - 18:00)`,
+      sunset: `${t('booking.session.sunset')} (19:00 - 21:30)`,
+      fullday: `${t('booking.session.fullday')} (10:00 - 20:30)`
+    }
+    const sessionLabel = sessionLabels[selectedSession] || sessionLabels.morning
 
     return (
       <div className="booking-success">

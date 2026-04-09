@@ -88,12 +88,23 @@ export default async function handler(req, res) {
     }
 
     // Session details
-    const sessionLabel = reservation.session === 'morning'
-      ? 'Mañana (10:00 - 14:00)'
-      : 'Atardecer (16:00 - 20:00)';
+    const sessionLabels = {
+      morning: 'Medio día mañana (10:00 - 14:00)',
+      afternoon: 'Medio día tarde (14:30 - 18:00)',
+      sunset: 'Atardecer (19:00 - 21:30)',
+      fullday: 'Día completo (10:00 - 20:30)'
+    };
 
-    const startTime = reservation.session === 'morning' ? '10:00' : '16:00';
-    const endTime = reservation.session === 'morning' ? '14:00' : '20:00';
+    const sessionTimes = {
+      morning: { start: '10:00', end: '14:00' },
+      afternoon: { start: '14:30', end: '18:00' },
+      sunset: { start: '19:00', end: '21:30' },
+      fullday: { start: '10:00', end: '20:30' }
+    };
+
+    const sessionLabel = sessionLabels[reservation.session] || sessionLabels.morning;
+    const startTime = sessionTimes[reservation.session]?.start || '10:00';
+    const endTime = sessionTimes[reservation.session]?.end || '14:00';
 
     const dateFormatted = new Date(reservation.date + 'T00:00:00').toLocaleDateString('es-ES', {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
@@ -114,7 +125,7 @@ export default async function handler(req, res) {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              summary: `⛵ Atlantis — ${reservation.name} (${reservation.session === 'morning' ? 'Mañana' : 'Atardecer'})`,
+              summary: `⛵ Atlantis — ${reservation.name} (${sessionLabel.split('(')[0].trim()})`,
               description: `Reserva Atlantis Charters\n\nCliente: ${reservation.name}\nEmail: ${reservation.email}\nTeléfono: ${reservation.phone}\nPasajeros: ${reservation.passengers}${reservation.message ? `\nMensaje: ${reservation.message}` : ''}`,
               start: {
                 dateTime: `${reservation.date}T${startTime}:00`,

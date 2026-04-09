@@ -38,8 +38,8 @@ export default async function handler(req, res) {
   }
 
   // Validate session value
-  if (!['morning', 'sunset'].includes(session)) {
-    return res.status(400).json({ error: 'Invalid session. Must be "morning" or "sunset"' });
+  if (!['morning', 'afternoon', 'sunset', 'fullday'].includes(session)) {
+    return res.status(400).json({ error: 'Invalid session. Must be "morning", "afternoon", "sunset", or "fullday"' });
   }
 
   // Validate passengers
@@ -91,13 +91,22 @@ export default async function handler(req, res) {
     }
 
     // Format session details for emails
-    const sessionLabel = session === 'morning'
-      ? 'Mañana (10:00 - 14:00)'
-      : 'Atardecer (16:00 - 20:00)';
+    const sessionLabels = {
+      morning: 'Medio día mañana (10:00 - 14:00)',
+      afternoon: 'Medio día tarde (14:30 - 18:00)',
+      sunset: 'Atardecer (19:00 - 21:30)',
+      fullday: 'Día completo (10:00 - 20:30)'
+    };
 
-    const sessionLabelEN = session === 'morning'
-      ? 'Morning (10:00 - 14:00)'
-      : 'Sunset (16:00 - 20:00)';
+    const sessionLabelsEN = {
+      morning: 'Morning (10:00 - 14:00)',
+      afternoon: 'Afternoon (14:30 - 18:00)',
+      sunset: 'Sunset (19:00 - 21:30)',
+      fullday: 'Full day (10:00 - 20:30)'
+    };
+
+    const sessionLabel = sessionLabels[session] || sessionLabels.morning;
+    const sessionLabelEN = sessionLabelsEN[session] || sessionLabelsEN.morning;
 
     const dateFormatted = new Date(date + 'T00:00:00').toLocaleDateString('es-ES', {
       weekday: 'long',
