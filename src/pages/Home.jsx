@@ -25,7 +25,7 @@ const REVIEWS = [
     date: 'Hace 10 meses',
     image: '/images/style.3.png',
     session: 'sunset',
-    sessionLabel: '🌅 Atardecer',
+    sessionLabel: 'Atardecer',
   },
   {
     initials: 'MC', color: '#2A6E8A',
@@ -34,7 +34,7 @@ const REVIEWS = [
     date: 'Hace 9 meses',
     image: '/images/style.2.png',
     session: 'morning',
-    sessionLabel: '☀️ Mañana',
+    sessionLabel: 'Mañana',
   },
   {
     initials: 'LC', color: '#C49A3C',
@@ -43,7 +43,7 @@ const REVIEWS = [
     date: 'Hace 8 meses',
     image: '/images/style.4.png',
     session: 'fullday',
-    sessionLabel: '🌊 Día Completo',
+    sessionLabel: 'Día Completo',
   },
   {
     initials: 'BP', color: '#C8574A',
@@ -52,7 +52,7 @@ const REVIEWS = [
     date: 'Hace 6 meses',
     image: '/images/style.5.png',
     session: 'afternoon',
-    sessionLabel: '🕑 Tarde',
+    sessionLabel: 'Tarde',
   },
   {
     initials: 'GG', color: '#2A6E8A',
@@ -61,7 +61,7 @@ const REVIEWS = [
     date: 'Hace 7 meses',
     image: '/images/style.6.png',
     session: 'morning',
-    sessionLabel: '☀️ Mañana',
+    sessionLabel: 'Mañana',
   },
   {
     initials: 'JD', color: '#C49A3C',
@@ -70,7 +70,7 @@ const REVIEWS = [
     date: 'Hace 7 meses',
     image: '/images/style.7.png',
     session: 'sunset',
-    sessionLabel: '🌅 Atardecer',
+    sessionLabel: 'Atardecer',
   },
 ]
 
