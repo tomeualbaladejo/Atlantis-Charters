@@ -50,8 +50,8 @@ export default async function handler(req, res) {
 
   // Validate passengers
   const passengersNum = parseInt(passengers);
-  if (isNaN(passengersNum) || passengersNum < 1 || passengersNum > 12) {
-    return res.status(400).json({ error: 'Passengers must be between 1 and 12' });
+  if (isNaN(passengersNum) || passengersNum < 1 || passengersNum > 6) {
+    return res.status(400).json({ error: 'Passengers must be between 1 and 6' });
   }
 
   try {

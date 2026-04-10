@@ -444,7 +444,7 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
               required
             >
               <option value="">{t('booking.form.selectPassengers')}</option>
-              {[...Array(12)].map((_, i) => (
+              {[...Array(6)].map((_, i) => (
                 <option key={i + 1} value={i + 1}>
                   {i + 1} {i === 0 ? t('booking.form.person') : t('booking.form.people')}
                 </option>
