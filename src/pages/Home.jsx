@@ -23,36 +23,54 @@ const REVIEWS = [
     name: 'Felicitas Mias', badge: null,
     text: 'Es el mejor plan que se puede hacer en mallorca. Escaparse de las playas con multitudes y pasar un día tranquilo con los tuyos. Federico fue super amable y nos preparó típicas tapas españolas acompañado por cervezas locales también. Hicimos snorkel paddle surf y disfrutamos de un día maravilloso. Super recomendable !!!!',
     date: 'Hace 10 meses',
+    image: '/images/style.3.png',
+    session: 'sunset',
+    sessionLabel: '🌅 Atardecer',
   },
   {
     initials: 'MC', color: '#2A6E8A',
     name: 'Marina Graciela Courcelles', badge: 'Local Guide',
     text: 'Una experiencia maravillosa desde que salimos hasta el regreso todo fué mágico! La atención de Felicitas y Federico que están super pendientes de cada detalle para que sea realmente un viaje inolvidable. Lo recomiendo para quienes quieren desconectarse y disfrutar.',
     date: 'Hace 9 meses',
+    image: '/images/style.2.png',
+    session: 'morning',
+    sessionLabel: '☀️ Mañana',
   },
   {
     initials: 'LC', color: '#C49A3C',
     name: 'Luciano Cassoni', badge: null,
     text: 'El mejor plan para pasarla súper bien entre amigos o familia! La barca tradicional del mediterráneo es increíble, muy segura y con mucho estilo y cariño de sus dueños, quienes te hacen sentir como en casa desde el primer momento.',
     date: 'Hace 8 meses',
+    image: '/images/style.4.png',
+    session: 'fullday',
+    sessionLabel: '🌊 Día Completo',
   },
   {
     initials: 'BP', color: '#C8574A',
     name: 'Belen Pellejero', badge: 'Local Guide',
     text: 'Increíble experiencia para disfrutar con amigos y familia. Recorrimos lugares hermosos y pasamos un día inmejorable. Fede nos hizo sentir como si lo conociéramos desde siempre y nos brindó todo lo necesario para un día perfecto.',
     date: 'Hace 6 meses',
+    image: '/images/style.5.png',
+    session: 'afternoon',
+    sessionLabel: '🕑 Tarde',
   },
   {
     initials: 'GG', color: '#2A6E8A',
     name: 'Gonzalo Garcia', badge: null,
     text: 'Una experiencia inolvidable, recorrimos rincones hermosos de esta isla. Altamente recomendable, repetiria sin duda.',
     date: 'Hace 7 meses',
+    image: '/images/style.6.png',
+    session: 'morning',
+    sessionLabel: '☀️ Mañana',
   },
   {
     initials: 'JD', color: '#C49A3C',
     name: 'Josefina Damonte', badge: null,
     text: 'Excelente experiencia para recorrer y conocer la isla. Muy amable el staff y la comida riquísima. Recomiendo!!!',
     date: 'Hace 7 meses',
+    image: '/images/style.7.png',
+    session: 'sunset',
+    sessionLabel: '🌅 Atardecer',
   },
 ]
 
@@ -191,22 +209,34 @@ export default function Home() {
           >
             {REVIEWS.map((r, i) => (
               <motion.article key={i} className="review-card" variants={fadeUp}>
-                <div className="reviewer-row">
-                  <div className="reviewer-avatar" style={{ background: r.color }} aria-hidden="true">
-                    {r.initials}
-                  </div>
-                  <div>
-                    <div className="reviewer-name">{r.name}</div>
-                    {r.badge && <span className="local-guide-badge">{r.badge}</span>}
-                  </div>
+                <div className="review-image-wrapper">
+                  <img src={r.image} alt="" className="review-image" />
+                  <span className="review-session-badge">{r.sessionLabel}</span>
                 </div>
-                <div className="review-stars" aria-label="5 estrellas">★★★★★</div>
-                <p className="review-text">{r.text}</p>
-                <div className="review-footer">
-                  <span className="review-date">{r.date}</span>
-                  <span className="review-source">
-                    <span className="google-g" aria-label="Google">G</span> Google
-                  </span>
+                <div className="review-content">
+                  <div className="reviewer-row">
+                    <div className="reviewer-avatar" style={{ background: r.color }} aria-hidden="true">
+                      {r.initials}
+                    </div>
+                    <div>
+                      <div className="reviewer-name">{r.name}</div>
+                      {r.badge && <span className="local-guide-badge">{r.badge}</span>}
+                    </div>
+                  </div>
+                  <div className="review-stars" aria-label="5 estrellas">★★★★★</div>
+                  <p className="review-text">{r.text}</p>
+                  <div className="review-footer">
+                    <span className="review-date">{r.date}</span>
+                    <span className="review-source">
+                      <span className="google-g" aria-label="Google">G</span> Google
+                    </span>
+                  </div>
+                  <button
+                    className="review-cta-btn"
+                    onClick={() => openBooking(r.session)}
+                  >
+                    Reservar este plan →
+                  </button>
                 </div>
               </motion.article>
             ))}
