@@ -83,8 +83,23 @@ export default function Home() {
   const reservarRef = useRef(null)
 
   useEffect(() => {
-    document.title = 'Atlantis Charters | Alquiler de Barco en Port de Pollença, Mallorca'
-    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Vive una experiencia única a bordo de nuestro llaut mallorquín tradicional. Excursiones por el norte de Mallorca con snorkel, tapas y rincones secretos. Reserva ahora.')
+    document.title = 'Alquiler de Barco en Port de Pollença con Patrón | Atlantis Charters Mallorca'
+    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Alquiler de barco tradicional mallorquín (llaut) en Port de Pollença con patrón. Salidas de mañana, tarde, atardecer y día completo. Snorkel, paddle surf y tapas incluidos.')
+
+    // Ensure canonical is set
+    let canonical = document.querySelector('link[rel="canonical"]')
+    if (canonical) {
+      canonical.href = 'https://atlantis-charters.vercel.app/'
+    }
+
+    // Update OG tags
+    document.querySelector('meta[property="og:title"]')?.setAttribute('content', 'Alquiler de Barco en Port de Pollença con Patrón | Atlantis Charters Mallorca')
+    document.querySelector('meta[property="og:description"]')?.setAttribute('content', 'Alquiler de barco tradicional mallorquín (llaut) en Port de Pollença con patrón. Salidas de mañana, tarde, atardecer y día completo. Snorkel, paddle surf y tapas incluidos.')
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', 'https://atlantis-charters.vercel.app/')
+
+    // Update Twitter tags
+    document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', 'Alquiler de Barco en Port de Pollença con Patrón | Atlantis Charters Mallorca')
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', 'Alquiler de barco tradicional mallorquín (llaut) en Port de Pollença con patrón. Salidas de mañana, tarde, atardecer y día completo. Snorkel, paddle surf y tapas incluidos.')
   }, [])
 
   useEffect(() => {
@@ -153,6 +168,15 @@ export default function Home() {
             transition={{ duration: 0.9, delay: 0.55 }}
           >
             {t('hero.sub')}
+          </motion.p>
+
+          <motion.p
+            className="hero-seo-text"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.65 }}
+          >
+            Salidas diarias desde el Puerto de Pollença en barco tradicional mallorquín (llaut) con patrón. Snorkel, paddle surf y tapas locales incluidos. Reserva tu experiencia privada en las mejores calas de Mallorca.
           </motion.p>
 
           <motion.div

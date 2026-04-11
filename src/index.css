@@ -245,7 +245,17 @@ button, input, select, textarea { font-family: var(--font-body); }
   color: rgba(255,255,255,0.84);
   max-width: 460px;
   line-height: 1.65;
-  margin-bottom: 48px;
+  margin-bottom: 24px;
+}
+
+.hero-seo-text {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.75);
+  max-width: 520px;
+  line-height: 1.6;
+  margin-bottom: 40px;
+  text-align: center;
 }
 
 /* Booking bar */

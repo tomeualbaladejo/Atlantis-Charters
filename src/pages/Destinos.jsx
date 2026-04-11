@@ -294,8 +294,26 @@ export default function Destinos() {
   }
 
   useEffect(() => {
-    document.title = 'Destinos | Formentor, Cala Murta, La Victoria — Atlantis Charters'
-    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Visitamos los rincones más bonitos del norte de Mallorca: Playa Formentor, Cala Murta, La Fortaleza, La Victoria e Isla de Formentor. Solo accesibles desde el mar.')
+    document.title = 'Destinos y Calas en Barco desde Port de Pollença | Atlantis Charters'
+    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Descubre las mejores calas y rutas en barco desde Port de Pollença, Mallorca. Cala Figuera, Formentor y más destinos exclusivos con Atlantis Charters.')
+
+    // Set canonical
+    let canonical = document.querySelector('link[rel="canonical"]')
+    if (!canonical) {
+      canonical = document.createElement('link')
+      canonical.rel = 'canonical'
+      document.head.appendChild(canonical)
+    }
+    canonical.href = 'https://atlantis-charters.vercel.app/destinos'
+
+    // Set OG tags
+    document.querySelector('meta[property="og:title"]')?.setAttribute('content', 'Destinos y Calas en Barco desde Port de Pollença | Atlantis Charters')
+    document.querySelector('meta[property="og:description"]')?.setAttribute('content', 'Descubre las mejores calas y rutas en barco desde Port de Pollença, Mallorca. Cala Figuera, Formentor y más destinos exclusivos con Atlantis Charters.')
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', 'https://atlantis-charters.vercel.app/destinos')
+
+    // Set Twitter tags
+    document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', 'Destinos y Calas en Barco desde Port de Pollença | Atlantis Charters')
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', 'Descubre las mejores calas y rutas en barco desde Port de Pollença, Mallorca. Cala Figuera, Formentor y más destinos exclusivos con Atlantis Charters.')
   }, [])
 
   return (

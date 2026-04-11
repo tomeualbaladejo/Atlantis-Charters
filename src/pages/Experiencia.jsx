@@ -51,8 +51,26 @@ export default function Experiencia() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    document.title = 'La Experiencia | Atlantis Charters Mallorca'
-    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Descubre qué incluye una salida a bordo del Atlantis. Trip all included: tapas españolas, bebidas, snorkel y los mejores rincones del norte de Mallorca.')
+    document.title = 'Experiencia a Bordo | Barco Tradicional Mallorquín | Atlantis Charters'
+    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Vive una experiencia única a bordo de un llaut mallorquín tradicional. Snorkel, paddle surf, tapas locales y calas vírgenes en Mallorca con Atlantis Charters.')
+
+    // Set canonical
+    let canonical = document.querySelector('link[rel="canonical"]')
+    if (!canonical) {
+      canonical = document.createElement('link')
+      canonical.rel = 'canonical'
+      document.head.appendChild(canonical)
+    }
+    canonical.href = 'https://atlantis-charters.vercel.app/experiencia'
+
+    // Set OG tags
+    document.querySelector('meta[property="og:title"]')?.setAttribute('content', 'Experiencia a Bordo | Barco Tradicional Mallorquín | Atlantis Charters')
+    document.querySelector('meta[property="og:description"]')?.setAttribute('content', 'Vive una experiencia única a bordo de un llaut mallorquín tradicional. Snorkel, paddle surf, tapas locales y calas vírgenes en Mallorca con Atlantis Charters.')
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', 'https://atlantis-charters.vercel.app/experiencia')
+
+    // Set Twitter tags
+    document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', 'Experiencia a Bordo | Barco Tradicional Mallorquín | Atlantis Charters')
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', 'Vive una experiencia única a bordo de un llaut mallorquín tradicional. Snorkel, paddle surf, tapas locales y calas vírgenes en Mallorca con Atlantis Charters.')
   }, [])
 
   const goReservar = () => {

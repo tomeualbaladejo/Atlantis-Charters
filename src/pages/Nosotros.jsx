@@ -57,8 +57,26 @@ export default function Nosotros() {
   ]
 
   useEffect(() => {
-    document.title = 'Feli & Fede | Capitanes del Atlantis — Port de Pollença'
-    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Somos Feli y Fede, capitanes del Atlantis. Un proyecto familiar nacido del amor por el mar y Mallorca. Conoce nuestra historia.')
+    document.title = 'Sobre Nosotros | Capitán Federico | Atlantis Charters Port de Pollença'
+    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Conoce al capitán Federico y el equipo de Atlantis Charters. Más de 10 años de experiencia navegando las aguas de Mallorca en barco tradicional mallorquín.')
+
+    // Set canonical
+    let canonical = document.querySelector('link[rel="canonical"]')
+    if (!canonical) {
+      canonical = document.createElement('link')
+      canonical.rel = 'canonical'
+      document.head.appendChild(canonical)
+    }
+    canonical.href = 'https://atlantis-charters.vercel.app/nosotros'
+
+    // Set OG tags
+    document.querySelector('meta[property="og:title"]')?.setAttribute('content', 'Sobre Nosotros | Capitán Federico | Atlantis Charters Port de Pollença')
+    document.querySelector('meta[property="og:description"]')?.setAttribute('content', 'Conoce al capitán Federico y el equipo de Atlantis Charters. Más de 10 años de experiencia navegando las aguas de Mallorca en barco tradicional mallorquín.')
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', 'https://atlantis-charters.vercel.app/nosotros')
+
+    // Set Twitter tags
+    document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', 'Sobre Nosotros | Capitán Federico | Atlantis Charters Port de Pollença')
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', 'Conoce al capitán Federico y el equipo de Atlantis Charters. Más de 10 años de experiencia navegando las aguas de Mallorca en barco tradicional mallorquín.')
   }, [])
 
   return (
