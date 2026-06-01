@@ -103,30 +103,6 @@ const MODAL_CONFIG = {
 ───────────────────────────────────────────── */
 const DESTINATIONS = [
   {
-    modalId: 'fortaleza',
-    img:     '/images/fortaleza/main.fortaleza.png',
-    alt:     'La Fortaleza, Bahía de Pollença',
-    badge:   'Punto emblemático',
-    title:   ['La ', 'Fortaleza'],
-    bullets: [
-      'Solo visible desde el mar — acceso exclusivo en barco',
-      'Fortaleza del s. XVII, hoy la propiedad más cara de España',
-      'Vista panorámica de la Bahía de Pollença',
-    ],
-  },
-  {
-    modalId: 'formentor',
-    img:     '/images/formentor/main.formentor.png',
-    alt:     'Playa Formentor, Mallorca',
-    badge:   'Arena dorada',
-    title:   ['Playa ', 'Formentor'],
-    bullets: [
-      '840m de arena fina y aguas turquesas cristalinas',
-      'Pinos mediterráneos que dan sombra natural sobre la orilla',
-      'Ideal para snorkel, paddle surf y baño tranquilo',
-    ],
-  },
-  {
     modalId: 'cala-murta',
     img:     '/images/cala-murta/main.cala-murta.png',
     alt:     'Cala Murta, Reserva de Formentor',
@@ -148,18 +124,6 @@ const DESTINATIONS = [
       'Península salvaje entre Alcúdia y Pollença',
       'Calas escondidas perfectas para el baño',
       'Paisaje de acantilados y pinos sobre el Mediterráneo',
-    ],
-  },
-  {
-    modalId: 'isla-formentor',
-    img:     '/images/isla-de-formentor/main.isla-de-formentor.png',
-    alt:     'Isla de Formentor, Mallorca',
-    badge:   'Fauna marina',
-    title:   ['Isla de ', 'Formentor'],
-    bullets: [
-      'Islote junto a la playa con una espectacular cueva marina',
-      'Snorkel entre las rocas con gran diversidad de peces',
-      'Espectacular desde el mar a bordo del Atlantis',
     ],
   },
 ]

@@ -65,12 +65,6 @@ const AFTER_FORMENTOR = [
   },
 ]
 
-const FORMENTOR_SLIDES = [
-  '/images/formentor/formentor-1.png',
-  '/images/formentor/formentor-2.png',
-  '/images/formentor/formentor-3.png',
-]
-
 function DestCard({ dest, variants }) {
   return (
     <motion.article className="dest-card" variants={variants}>
@@ -103,122 +97,8 @@ function PalmIcon() {
   )
 }
 
-/* ── Formentor Modal ── */
-function FormentorModal({ isOpen, onClose, slide, onPrev, onNext }) {
-  if (!isOpen) return null
-  return (
-    <div
-      className="modal-overlay"
-      onClick={e => { if (e.target === e.currentTarget) onClose() }}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Galería Playa Formentor"
-    >
-      <div className="modal-box">
-
-        {/* Slideshow */}
-        <div className="modal-slideshow">
-          {FORMENTOR_SLIDES.map((src, i) => (
-            <img
-              key={i}
-              className={`slide${slide === i ? ' active' : ''}`}
-              src={src}
-              alt={`Playa Formentor ${i + 1}`}
-            />
-          ))}
-
-          {/* Arrows */}
-          <button
-            className="modal-arrow modal-arrow-prev"
-            onClick={onPrev}
-            aria-label="Anterior"
-          >
-            ←
-          </button>
-          <button
-            className="modal-arrow modal-arrow-next"
-            onClick={onNext}
-            aria-label="Siguiente"
-          >
-            →
-          </button>
-
-          {/* Dots */}
-          <div className="modal-dots" aria-hidden="true">
-            {FORMENTOR_SLIDES.map((_, i) => (
-              <span key={i} className={`dot${slide === i ? ' active' : ''}`} />
-            ))}
-          </div>
-        </div>
-
-        {/* Close */}
-        <button className="modal-close" onClick={onClose} aria-label="Cerrar">×</button>
-
-        {/* Content */}
-        <div className="modal-content">
-          <h3 className="modal-title">Playa Formentor</h3>
-          <p className="modal-location">Formentor, Pollença · Norte de Mallorca</p>
-
-          <hr className="card-divider" aria-hidden="true" />
-
-          <div className="modal-pills">
-            <span className="modal-pill">Arena dorada</span>
-            <span className="modal-pill">Snorkel</span>
-            <span className="modal-pill">Aguas cristalinas</span>
-          </div>
-
-          <p className="modal-desc">
-            840 metros de arena fina bañados por aguas turquesas rodeadas de pinos mediterráneos. Una de las playas más espectaculares del norte de Mallorca, perfecta para el snorkel, el baño tranquilo y el descanso bajo la sombra de los pinos. Desde el barco, la vista es simplemente única.
-          </p>
-
-          <a
-            className="modal-tripadvisor"
-            href="https://www.tripadvisor.es/Attraction_Review-g1189104-d6429161-Reviews-Formentor_Playa-Formentor_Majorca_Balearic_Islands.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            ⭐ Ver reseñas en TripAdvisor →
-          </a>
-        </div>
-
-      </div>
-    </div>
-  )
-}
-
 export default function Places() {
   const navigate = useNavigate()
-
-  /* ── Modal state ── */
-  const [modalOpen,  setModalOpen]  = useState(false)
-  const [slide,      setSlide]      = useState(0)
-  const [resetKey,   setResetKey]   = useState(0)   // bumping restarts autoplay
-
-  /* ── Autoplay: restarts when modal opens or resetKey changes ── */
-  useEffect(() => {
-    if (!modalOpen) return
-    const t = setInterval(() => setSlide(s => (s + 1) % 3), 3500)
-    return () => clearInterval(t)
-  }, [modalOpen, resetKey])
-
-  /* ── Escape key ── */
-  useEffect(() => {
-    const onKey = e => { if (e.key === 'Escape') closeModal() }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [])
-
-  /* ── Lock body scroll ── */
-  useEffect(() => {
-    document.body.style.overflow = modalOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [modalOpen])
-
-  const openModal = () => { setSlide(0); setModalOpen(true) }
-  const closeModal = () => setModalOpen(false)
-
-  const goNext = () => { setSlide(s => (s + 1) % 3); setResetKey(k => k + 1) }
-  const goPrev = () => { setSlide(s => (s + 2) % 3); setResetKey(k => k + 1) }
 
   const goReservar = () => {
     navigate('/#reservar')
@@ -279,50 +159,10 @@ export default function Places() {
           whileInView="show"
           viewport={inView}
         >
-          {/* Cards before Formentor */}
+          {/* All destination cards */}
           {BEFORE_FORMENTOR.map((dest, i) => (
             <DestCard key={i} dest={dest} variants={fadeUp} />
           ))}
-
-          {/* ── Playa Formentor — clickable card with gallery ── */}
-          <motion.article
-            className="dest-card dest-card-clickable"
-            variants={fadeUp}
-            onClick={openModal}
-            role="button"
-            tabIndex={0}
-            aria-label="Playa Formentor — Ver galería"
-            onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && openModal()}
-          >
-            <div className="card-photo-wrap">
-              <img
-                className="card-photo"
-                src="/images/formentor/main.formentor.png"
-                alt="Playa Formentor"
-                loading="lazy"
-              />
-            </div>
-            <div className="card-body">
-              <span className="card-badge">Arena dorada</span>
-              <h2 className="card-title">
-                Playa <span className="highlight">Formentor</span>
-              </h2>
-              <hr className="card-divider" aria-hidden="true" />
-              <ul className="card-bullets">
-                <li>840m de arena fina y aguas turquesas cristalinas</li>
-                <li>Pinos mediterráneos que dan sombra natural sobre la orilla</li>
-                <li>Ideal para snorkel, paddle surf y baño tranquilo</li>
-              </ul>
-              <div className="card-gallery-trigger" aria-hidden="true">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-                  <polygon points="0,0 10,5 0,10"/>
-                </svg>
-                Ver galería →
-              </div>
-            </div>
-          </motion.article>
-
-          {/* Cards after Formentor */}
           {AFTER_FORMENTOR.map((dest, i) => (
             <DestCard key={i} dest={dest} variants={fadeUp} />
           ))}
@@ -361,15 +201,6 @@ export default function Places() {
       </motion.section>
 
       <Footer />
-
-      {/* ── FORMENTOR MODAL ── */}
-      <FormentorModal
-        isOpen={modalOpen}
-        onClose={closeModal}
-        slide={slide}
-        onPrev={goPrev}
-        onNext={goNext}
-      />
     </motion.div>
   )
 }

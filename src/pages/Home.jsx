@@ -228,57 +228,7 @@ export default function Home() {
             whileInView="show"
             viewport={inView}
           >
-            {/* Card 1 - Mañana */}
-            <motion.article className="plan-card" variants={fadeUp}>
-              <div className="plan-image-wrapper">
-                <img src="/images/formentor/main.formentor.png" alt="Salida de mañana" className="plan-image" />
-                <div className="plan-price-badge">104€ depósito · Total 520€</div>
-              </div>
-              <div className="plan-content">
-                <h3 className="plan-title">Mañana | 4 horas</h3>
-                <div className="plan-hours">
-                  <svg className="plan-clock-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  10:00 – 14:00
-                </div>
-                <p className="plan-description">
-                  Media jornada navegando por las mejores calas de la costa de Formentor. Snorkel y paddle surf incluidos.
-                </p>
-                <button
-                  className="plan-cta-btn"
-                  onClick={() => openBooking('morning')}
-                  type="button"
-                >
-                  Reservar
-                </button>
-              </div>
-            </motion.article>
-
-            {/* Card 2 - Tarde */}
-            <motion.article className="plan-card" variants={fadeUp}>
-              <div className="plan-image-wrapper">
-                <img src="/images/isla-de-formentor/main.isla-de-formentor.png" alt="Salida de tarde" className="plan-image" />
-                <div className="plan-price-badge">104€ depósito · Total 520€</div>
-              </div>
-              <div className="plan-content">
-                <h3 className="plan-title">Tarde | 4 horas</h3>
-                <div className="plan-hours">
-                  <svg className="plan-clock-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  14:30 – 18:30
-                </div>
-                <p className="plan-description">
-                  Descubre las calas más cristalinas de la tarde. Snorkel, paddle surf y tapas mallorquinas incluidas.
-                </p>
-                <button
-                  className="plan-cta-btn"
-                  onClick={() => openBooking('afternoon')}
-                  type="button"
-                >
-                  Reservar
-                </button>
-              </div>
-            </motion.article>
-
-            {/* Card 3 - Día Completo */}
+            {/* Card 1 - Día Completo */}
             <motion.article className="plan-card" variants={fadeUp}>
               <div className="plan-image-wrapper">
                 <img src="/images/la-victoria/main.la-victoria.png" alt="Día completo" className="plan-image" />
@@ -303,7 +253,7 @@ export default function Home() {
               </div>
             </motion.article>
 
-            {/* Card 4 - Atardecer */}
+            {/* Card 2 - Atardecer */}
             <motion.article className="plan-card" variants={fadeUp}>
               <div className="plan-image-wrapper">
                 <img src="/images/cala-murta/main.cala-murta.png" alt="Salida al atardecer" className="plan-image" />
