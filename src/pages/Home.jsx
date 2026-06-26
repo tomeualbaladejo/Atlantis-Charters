@@ -132,75 +132,45 @@ export default function Home() {
 
       {/* ── HERO ── */}
       <section id="inicio" className="hero" aria-label="Portada">
-        <video
-          className="hero-video"
-          autoPlay muted loop playsInline
-          poster="/images/style.1.png"
-        >
-          <source src="/images/Hero.video.mov" type="video/quicktime" />
-          <source src="/images/Hero.video.mov" type="video/mp4" />
-        </video>
-        <div className="hero-overlay" aria-hidden="true" />
-
         <div className="hero-content">
-          <motion.p
-            className="hero-tag"
-            initial={{ opacity: 0, y: 16 }}
+          <motion.div
+            className="hero-reserve-bar"
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
           >
-            {t('hero.tag')}
-          </motion.p>
-
-          <motion.h1
-            className="hero-headline"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.35 }}
-          >
-            {t('hero.h1')}
-          </motion.h1>
-
-          <motion.p
-            className="hero-subtitle"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.55 }}
-          >
-            {t('hero.sub')}
-          </motion.p>
-
-          <motion.p
-            className="hero-seo-text"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.65 }}
-          >
-            Salidas diarias desde el Puerto de Pollença en barco tradicional mallorquín (llaut) con patrón. Snorkel, paddle surf y tapas locales incluidos. Reserva tu experiencia privada en las mejores calas de Mallorca.
-          </motion.p>
-
-          <motion.div
-            className="booking-bar-simple"
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.75 }}
-          >
-            <button className="booking-cta-btn-full" onClick={handleOpenBooking} type="button">
-              {t('hero.availability')} →
+            <button className="hero-reserve-btn" onClick={handleOpenBooking} type="button">
+              RESERVAR →
             </button>
           </motion.div>
-        </div>
 
-        <motion.div
-          className="scroll-cue"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.8 }}
-          aria-hidden="true"
-        >
-          <span>Scroll</span>
-          <div className="scroll-line" />
-        </motion.div>
+          <motion.div
+            className="hero-video-wrapper"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.3 }}
+          >
+            <video
+              className="hero-video"
+              autoPlay muted loop playsInline
+              poster="/images/style.1.png"
+            >
+              <source src="/images/Hero.video.mov" type="video/quicktime" />
+              <source src="/images/Hero.video.mov" type="video/mp4" />
+            </video>
+          </motion.div>
+
+          <motion.div
+            className="scroll-cue"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.0, duration: 0.8 }}
+            aria-hidden="true"
+          >
+            <span>Scroll</span>
+            <div className="scroll-line" />
+          </motion.div>
+        </div>
       </section>
 
       {/* ── PLANS ── */}
@@ -228,7 +198,57 @@ export default function Home() {
             whileInView="show"
             viewport={inView}
           >
-            {/* Card 1 - Día Completo */}
+            {/* Card 1 - Mañana */}
+            <motion.article className="plan-card" variants={fadeUp}>
+              <div className="plan-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80" alt="Salida de mañana" className="plan-image" />
+                <div className="plan-price-badge">104€ depósito · Total 520€</div>
+              </div>
+              <div className="plan-content">
+                <h3 className="plan-title">Mañana | 4 horas</h3>
+                <div className="plan-hours">
+                  <svg className="plan-clock-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  10:00 – 14:00
+                </div>
+                <p className="plan-description">
+                  La salida matinal. Aguas tranquilas y luz suave para empezar el día navegando.
+                </p>
+                <button
+                  className="plan-cta-btn"
+                  onClick={() => openBooking('morning')}
+                  type="button"
+                >
+                  Reservar
+                </button>
+              </div>
+            </motion.article>
+
+            {/* Card 2 - Tarde */}
+            <motion.article className="plan-card" variants={fadeUp}>
+              <div className="plan-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&q=80" alt="Salida de tarde" className="plan-image" />
+                <div className="plan-price-badge">104€ depósito · Total 520€</div>
+              </div>
+              <div className="plan-content">
+                <h3 className="plan-title">Tarde | 4 horas</h3>
+                <div className="plan-hours">
+                  <svg className="plan-clock-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  14:30 – 18:30
+                </div>
+                <p className="plan-description">
+                  La tarde perfecta en el mar. Baño, snorkel y las mejores calas bajo el sol de la tarde.
+                </p>
+                <button
+                  className="plan-cta-btn"
+                  onClick={() => openBooking('afternoon')}
+                  type="button"
+                >
+                  Reservar
+                </button>
+              </div>
+            </motion.article>
+
+            {/* Card 3 - Día Completo */}
             <motion.article className="plan-card" variants={fadeUp}>
               <div className="plan-image-wrapper">
                 <img src="/images/la-victoria/main.la-victoria.png" alt="Día completo" className="plan-image" />
@@ -253,7 +273,7 @@ export default function Home() {
               </div>
             </motion.article>
 
-            {/* Card 2 - Atardecer */}
+            {/* Card 4 - Atardecer */}
             <motion.article className="plan-card" variants={fadeUp}>
               <div className="plan-image-wrapper">
                 <img src="/images/cala-murta/main.cala-murta.png" alt="Salida al atardecer" className="plan-image" />

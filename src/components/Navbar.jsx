@@ -130,22 +130,39 @@ export default function Navbar() {
   const isActive = (path) =>
     path === '/' ? location.pathname === '/' : location.pathname === path
 
-  const NAV_ITEMS = [
+  const NAV_LEFT = [
     { labelKey: 'nav.inicio',      path: '/' },
     { labelKey: 'nav.experiencia', path: '/experiencia' },
     { labelKey: 'nav.destinos',    path: '/destinos' },
+  ]
+  const NAV_RIGHT = [
     { labelKey: 'nav.nosotros',    path: '/nosotros' },
   ]
+  const NAV_ITEMS = [...NAV_LEFT, ...NAV_RIGHT]
 
   return (
     <>
       <nav className="navbar" role="navigation" aria-label="Navegación principal">
+        <ul className="navbar-links navbar-links-left">
+          {NAV_LEFT.map(item => (
+            <li key={item.labelKey}>
+              <Link
+                to={item.path}
+                className={isActive(item.path) ? 'active' : ''}
+                aria-current={isActive(item.path) ? 'page' : undefined}
+              >
+                {t(item.labelKey)}
+              </Link>
+            </li>
+          ))}
+        </ul>
+
         <Link to="/" onClick={() => setMenuOpen(false)} aria-label="Inicio" className="navbar-logo">
           <img src="/images/logo-atlantis.png" alt="Atlantis Charters" />
         </Link>
 
-        <ul className="navbar-links">
-          {NAV_ITEMS.map(item => (
+        <ul className="navbar-links navbar-links-right">
+          {NAV_RIGHT.map(item => (
             <li key={item.labelKey}>
               <Link
                 to={item.path}

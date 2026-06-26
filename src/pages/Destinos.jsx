@@ -37,6 +37,7 @@ const MODAL_CONFIG = {
   },
   fortaleza: {
     slides: [
+      '/images/fortaleza/2-fortaleza.png',
       '/images/fortaleza/fortaleza.1.png',
     ],
     title:       'La Fortaleza',
@@ -124,6 +125,30 @@ const DESTINATIONS = [
       'Península salvaje entre Alcúdia y Pollença',
       'Calas escondidas perfectas para el baño',
       'Paisaje de acantilados y pinos sobre el Mediterráneo',
+    ],
+  },
+  {
+    modalId: 'fortaleza',
+    img:     '/images/fortaleza/2-fortaleza.png',
+    alt:     'La Fortaleza, Mallorca',
+    badge:   'Histórico',
+    title:   ['La ', 'Fortaleza'],
+    bullets: [
+      'Imponente finca privada en el acantilado de La Victoria',
+      'Vistas panorámicas al mar desde la costa norte',
+      'Uno de los rincones más exclusivos de Mallorca',
+    ],
+  },
+  {
+    modalId: 'playa-formentor',
+    img:     'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80',
+    alt:     'Playa de Formentor, Mallorca',
+    badge:   'Aguas cristalinas',
+    title:   ['Playa de ', 'Formentor'],
+    bullets: [
+      'Playa virgen rodeada de pinos y montañas',
+      'Aguas turquesas en el extremo norte de Mallorca',
+      'Accesible solo por carretera de montaña o barco',
     ],
   },
 ]
