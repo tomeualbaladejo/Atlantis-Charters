@@ -240,6 +240,7 @@ button, input, select, textarea { font-family: var(--font-body); }
 .hero-reserve-btn:active { transform: scale(0.99); }
 
 .hero-video-wrapper {
+  position: relative;
   width: 100%;
   max-width: 980px;
   aspect-ratio: 16 / 9;
@@ -253,6 +254,37 @@ button, input, select, textarea { font-family: var(--font-body); }
   height: 100%;
   object-fit: cover;
   display: block;
+}
+.hero-video-mute-btn {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 50%;
+  background: rgba(0,0,0,0.42);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, border-color 0.2s;
+}
+.hero-video-mute-btn:hover {
+  background: rgba(0,0,0,0.62);
+  border-color: rgba(255,255,255,0.55);
+}
+.hero-video-mute-btn:active {
+  transform: scale(0.94);
+}
+.hero-video-mute-btn:focus-visible {
+  outline: 2px solid rgba(255,255,255,0.8);
+  outline-offset: 2px;
 }
 
 /* Booking bar */
@@ -630,9 +662,14 @@ button, input, select, textarea { font-family: var(--font-body); }
   line-height: 1.6;
 }
 .plans-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 24px;
+}
+.plans-grid > .plan-card {
+  flex: 0 0 calc((100% - 48px) / 3);
+  max-width: calc((100% - 48px) / 3);
 }
 .plan-card {
   background: var(--white);
@@ -733,14 +770,20 @@ button, input, select, textarea { font-family: var(--font-body); }
 /* Mobile responsive */
 @media (max-width: 1024px) {
   .plans-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
+  }
+  .plans-grid > .plan-card {
+    flex: 0 0 calc((100% - 20px) / 2);
+    max-width: calc((100% - 20px) / 2);
   }
 }
 @media (max-width: 480px) {
   .plans-grid {
-    grid-template-columns: 1fr;
     gap: 20px;
+  }
+  .plans-grid > .plan-card {
+    flex: 0 0 100%;
+    max-width: 100%;
   }
   .plan-image-wrapper {
     height: 180px;

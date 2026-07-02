@@ -379,7 +379,6 @@ export default function Destinos() {
                 />
               </div>
               <div className="card-body">
-                <span className="card-badge">{dest.badge}</span>
                 <h2 className="card-title">
                   {dest.title[0]}<span className="highlight">{dest.title[1]}</span>
                 </h2>

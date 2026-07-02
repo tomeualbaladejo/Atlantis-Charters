@@ -81,6 +81,19 @@ export default function Home() {
   const { openBooking } = useBooking()
   const location    = useLocation()
   const reservarRef = useRef(null)
+  const heroVideoRef = useRef(null)
+  const [heroMuted, setHeroMuted] = useState(true)
+
+  const toggleHeroMute = () => {
+    const v = heroVideoRef.current
+    if (!v) return
+    const next = !v.muted
+    v.muted = next
+    setHeroMuted(next)
+    if (!next) {
+      v.play().catch(() => {})
+    }
+  }
 
   useEffect(() => {
     document.title = 'Alquiler de Barco en Port de Pollença con Patrón | Atlantis Charters Mallorca'
@@ -151,13 +164,35 @@ export default function Home() {
             transition={{ duration: 0.9, delay: 0.3 }}
           >
             <video
+              ref={heroVideoRef}
               className="hero-video"
               autoPlay muted loop playsInline
               poster="/images/style.1.png"
             >
-              <source src="/images/Hero.video.mov" type="video/quicktime" />
-              <source src="/images/Hero.video.mov" type="video/mp4" />
+              <source src="/images/Hero.video.mp4" type="video/mp4" />
             </video>
+
+            <button
+              type="button"
+              className="hero-video-mute-btn"
+              onClick={toggleHeroMute}
+              aria-label={heroMuted ? 'Activar sonido' : 'Silenciar'}
+              aria-pressed={!heroMuted}
+            >
+              {heroMuted ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                  <line x1="23" y1="9" x2="17" y2="15"/>
+                  <line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                </svg>
+              )}
+            </button>
           </motion.div>
 
           <motion.div
@@ -201,7 +236,7 @@ export default function Home() {
             {/* Card 1 - Mañana */}
             <motion.article className="plan-card" variants={fadeUp}>
               <div className="plan-image-wrapper">
-                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80" alt="Salida de mañana" className="plan-image" />
+                <img src="/images/mañana.jpg" alt="Salida de mañana" className="plan-image" />
                 <div className="plan-price-badge">104€ depósito · Total 520€</div>
               </div>
               <div className="plan-content">
@@ -223,10 +258,60 @@ export default function Home() {
               </div>
             </motion.article>
 
-            {/* Card 2 - Tarde */}
+            {/* Card 2 - Medio Día */}
             <motion.article className="plan-card" variants={fadeUp}>
               <div className="plan-image-wrapper">
-                <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&q=80" alt="Salida de tarde" className="plan-image" />
+                <img src="/images/medio-dia.jpg" alt="Medio día" className="plan-image" />
+                <div className="plan-price-badge">114€ depósito · Total 570€</div>
+              </div>
+              <div className="plan-content">
+                <h3 className="plan-title">Medio Día | 6 horas</h3>
+                <div className="plan-hours">
+                  <svg className="plan-clock-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  10:00 – 16:00
+                </div>
+                <p className="plan-description">
+                  El equilibrio perfecto. Más tiempo que la media jornada para descubrir varias calas con calma.
+                </p>
+                <button
+                  className="plan-cta-btn"
+                  onClick={() => openBooking('halfday')}
+                  type="button"
+                >
+                  Reservar
+                </button>
+              </div>
+            </motion.article>
+
+            {/* Card 3 - Día Completo */}
+            <motion.article className="plan-card" variants={fadeUp}>
+              <div className="plan-image-wrapper">
+                <img src="/images/la-victoria/main.la-victoria.png" alt="Día completo" className="plan-image" />
+                <div className="plan-price-badge">124€ depósito · Total 620€</div>
+              </div>
+              <div className="plan-content">
+                <h3 className="plan-title">Día Completo | 8 horas</h3>
+                <div className="plan-hours">
+                  <svg className="plan-clock-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  10:00 – 18:00
+                </div>
+                <p className="plan-description">
+                  La experiencia completa. Desde la Fortaleza hasta las calas más remotas del Cap de Formentor.
+                </p>
+                <button
+                  className="plan-cta-btn"
+                  onClick={() => openBooking('fullday')}
+                  type="button"
+                >
+                  Reservar
+                </button>
+              </div>
+            </motion.article>
+
+            {/* Card 4 - Tarde */}
+            <motion.article className="plan-card" variants={fadeUp}>
+              <div className="plan-image-wrapper">
+                <img src="/images/tarde.jpg" alt="Salida de tarde" className="plan-image" />
                 <div className="plan-price-badge">104€ depósito · Total 520€</div>
               </div>
               <div className="plan-content">
@@ -248,35 +333,10 @@ export default function Home() {
               </div>
             </motion.article>
 
-            {/* Card 3 - Día Completo */}
+            {/* Card 5 - Atardecer */}
             <motion.article className="plan-card" variants={fadeUp}>
               <div className="plan-image-wrapper">
-                <img src="/images/la-victoria/main.la-victoria.png" alt="Día completo" className="plan-image" />
-                <div className="plan-price-badge">124€ depósito · Total 620€</div>
-              </div>
-              <div className="plan-content">
-                <h3 className="plan-title">Día Completo | 8 horas</h3>
-                <div className="plan-hours">
-                  <svg className="plan-clock-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  10:00 – 18:30
-                </div>
-                <p className="plan-description">
-                  La experiencia completa. Desde la Fortaleza hasta las calas más remotas del Cap de Formentor.
-                </p>
-                <button
-                  className="plan-cta-btn"
-                  onClick={() => openBooking('fullday')}
-                  type="button"
-                >
-                  Reservar
-                </button>
-              </div>
-            </motion.article>
-
-            {/* Card 4 - Atardecer */}
-            <motion.article className="plan-card" variants={fadeUp}>
-              <div className="plan-image-wrapper">
-                <img src="/images/cala-murta/main.cala-murta.png" alt="Salida al atardecer" className="plan-image" />
+                <img src="/images/atardecer.jpg" alt="Salida al atardecer" className="plan-image" />
                 <div className="plan-price-badge">70€ depósito · Total 350€</div>
               </div>
               <div className="plan-content">
