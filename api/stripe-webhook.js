@@ -88,7 +88,7 @@ export default async function handler(req, res) {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            from: 'onboarding@resend.dev',
+            from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
             to: ['tomeualbaladejo@gmail.com'],
             subject: `💳 Pago recibido — Nueva reserva: ${reservation.name} · ${dateFormatted}`,
             html: `

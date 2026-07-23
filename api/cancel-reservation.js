@@ -82,7 +82,7 @@ export default async function handler(req, res) {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            from: 'Atlantis Charters <reservas@atlantis-charters.vercel.app>',
+            from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
             to: [reservation.email],
             subject: `❌ Reserva cancelada — Atlantis Charters`,
             html: `

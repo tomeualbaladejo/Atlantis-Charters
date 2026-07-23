@@ -208,7 +208,7 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'onboarding@resend.dev',
+          from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
           to: [reservation.email],
           subject: `✅ ¡Tu reserva está confirmada! — Atlantis Charters`,
           html: confirmationEmailHtml
@@ -227,7 +227,7 @@ export default async function handler(req, res) {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            from: 'onboarding@resend.dev',
+            from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
             to: ['tomeualbaladejo@gmail.com'],
             subject: `📋 REENVIAR AL CLIENTE: Confirmación para ${reservation.name} (${reservation.email})`,
             html: `
