@@ -4,6 +4,7 @@
 :root {
   --terra:       #C8574A;
   --terra-dark:  #A8473C;
+  --terra-deep:  #9E3F32;
   --terra-light: #E8836E;
   --terra-pale:  #FAECE7;
   --sand:        #F5F0E8;
@@ -49,8 +50,15 @@ button, input, select, textarea { font-family: var(--font-body); }
   align-items: center;
   justify-content: space-between;
   padding: 0 clamp(20px, 5vw, 64px);
-  background: #C85A4A;
+  background: var(--terra-deep);
   box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  transition: height 0.3s ease, box-shadow 0.3s ease;
+}
+@media (hover: hover) {
+  .navbar:hover {
+    height: calc(var(--nav-h) + 14px);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+  }
 }
 
 /* Logo (centered) */
@@ -62,8 +70,25 @@ button, input, select, textarea { font-family: var(--font-body); }
   z-index: 2;
 }
 .navbar-logo img {
-  height: 44px;
+  height: 56px;
   width: auto;
+  display: block;
+  transition: height 0.3s ease;
+}
+@media (hover: hover) {
+  .navbar:hover .navbar-logo img {
+    height: 64px;
+  }
+}
+@media (max-width: 768px) {
+  .navbar-logo img {
+    height: 48px;
+  }
+  @media (hover: hover) {
+    .navbar:hover .navbar-logo img {
+      height: 54px;
+    }
+  }
 }
 
 /* Desktop links */
@@ -118,23 +143,23 @@ button, input, select, textarea { font-family: var(--font-body); }
 
 /* CTA pill */
 .navbar-cta {
-  background: transparent !important;
+  background: var(--terra-deep) !important;
   color: #ffffff !important;
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
-  border-radius: 0 !important;
+  border-radius: 8px !important;
   opacity: 1 !important;
-  padding: 8px 4px;
+  padding: 10px 18px;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
   text-decoration: none;
-  transition: color 0.2s, transform 0.15s !important;
+  transition: background 0.2s, color 0.2s, transform 0.15s !important;
 }
 .navbar-cta::after { display: none !important; }
-.navbar-cta:hover  { background: transparent !important; color: rgba(255,255,255,0.75) !important; }
+.navbar-cta:hover  { background: #8A3729 !important; color: #fff !important; }
 .navbar-cta:active { transform: scale(0.97); }
 
 /* Hamburger */
@@ -224,8 +249,8 @@ button, input, select, textarea { font-family: var(--font-body); }
 }
 .hero-reserve-btn {
   width: 100%;
-  background: #fff;
-  color: var(--terra);
+  background: var(--terra-deep);
+  color: #fff;
   border: none;
   border-radius: 12px;
   padding: 22px 32px;
@@ -236,7 +261,7 @@ button, input, select, textarea { font-family: var(--font-body); }
   transition: background 0.22s, transform 0.15s, color 0.22s;
   box-shadow: 0 10px 32px rgba(0,0,0,0.18);
 }
-.hero-reserve-btn:hover  { background: var(--cream); transform: translateY(-2px); }
+.hero-reserve-btn:hover  { background: #8A3729; transform: translateY(-2px); }
 .hero-reserve-btn:active { transform: scale(0.99); }
 
 .hero-video-wrapper {
