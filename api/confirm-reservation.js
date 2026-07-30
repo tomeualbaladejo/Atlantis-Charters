@@ -3,60 +3,12 @@
 // Updates status to 'confirmed' and sends client confirmation email
 
 import { createClient } from '@supabase/supabase-js';
+import { getGoogleAccessToken } from './_google-auth.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
-
-// Generate JWT for Google Service Account
-async function getGoogleAccessToken() {
-  const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
-
-  const now = Math.floor(Date.now() / 1000);
-
-  // Create JWT header and payload
-  const header = { alg: 'RS256', typ: 'JWT' };
-  const payload = {
-    iss: serviceAccountEmail,
-    scope: 'https://www.googleapis.com/auth/calendar',
-    aud: 'https://oauth2.googleapis.com/token',
-    exp: now + 3600,
-    iat: now
-  };
-
-  // Base64url encode
-  const base64url = (obj) => Buffer.from(JSON.stringify(obj))
-    .toString('base64')
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
-
-  const signingInput = `${base64url(header)}.${base64url(payload)}`;
-
-  // Sign with private key using Node.js crypto
-  const { createSign } = await import('crypto');
-  const sign = createSign('RSA-SHA256');
-  sign.update(signingInput);
-  const signature = sign.sign(privateKey, 'base64')
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
-
-  const jwt = `${signingInput}.${signature}`;
-
-  // Exchange JWT for access token
-  const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
-  });
-
-  const tokenData = await tokenResponse.json();
-  console.log('Token response:', JSON.stringify(tokenData));
-  return tokenData.access_token;
-}
 
 export default async function handler(req, res) {
   const { id, token } = req.query;

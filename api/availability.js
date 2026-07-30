@@ -1,6 +1,8 @@
 // Vercel Serverless Function: Get calendar availability
 // Reads Google Calendar to return booked dates for a given month
 
+import { getGoogleAccessToken } from './_google-auth.js';
+
 export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -27,11 +29,18 @@ export default async function handler(req, res) {
     const timeMax = new Date(parseInt(year), parseInt(month), 0, 23, 59, 59).toISOString();
 
     const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID;
-    const API_KEY = process.env.GOOGLE_API_KEY;
 
-    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
+    const accessToken = await getGoogleAccessToken();
+    if (!accessToken) {
+      console.error('Failed to obtain Google access token for availability read');
+      return res.status(500).json({ error: 'Calendar auth error' });
+    }
 
-    const response = await fetch(url);
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
+
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
     const data = await response.json();
 
     if (data.error) {
