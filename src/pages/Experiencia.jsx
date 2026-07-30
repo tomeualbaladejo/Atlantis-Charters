@@ -61,12 +61,12 @@ export default function Experiencia() {
       canonical.rel = 'canonical'
       document.head.appendChild(canonical)
     }
-    canonical.href = 'https://atlantis-charters.vercel.app/experiencia'
+    canonical.href = (import.meta.env.VITE_PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app') + '/experiencia'
 
     // Set OG tags
     document.querySelector('meta[property="og:title"]')?.setAttribute('content', 'Experiencia a Bordo | Barco Tradicional Mallorquín | Atlantis Charters')
     document.querySelector('meta[property="og:description"]')?.setAttribute('content', 'Vive una experiencia única a bordo de un llaut mallorquín tradicional. Snorkel, paddle surf, tapas locales y calas vírgenes en Mallorca con Atlantis Charters.')
-    document.querySelector('meta[property="og:url"]')?.setAttribute('content', 'https://atlantis-charters.vercel.app/experiencia')
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', (import.meta.env.VITE_PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app') + '/experiencia')
 
     // Set Twitter tags
     document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', 'Experiencia a Bordo | Barco Tradicional Mallorquín | Atlantis Charters')

@@ -89,7 +89,7 @@ export default async function handler(req, res) {
           },
           body: JSON.stringify({
             from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
-            to: ['tomeualbaladejo@gmail.com'],
+            to: [process.env.CAPTAIN_EMAIL || 'Atlantis.charter.mallorca@gmail.com'],
             subject: `💳 Pago recibido — Nueva reserva: ${reservation.name} · ${dateFormatted}`,
             html: `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px;">
@@ -111,7 +111,7 @@ export default async function handler(req, res) {
   </div>
 
   <div style="text-align: center; margin: 32px 0;">
-    <a href="https://atlantis-charters.vercel.app/api/confirm-reservation?id=${reservation.id}&token=${reservation.id}"
+    <a href="${process.env.PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app'}/api/confirm-reservation?id=${reservation.id}&token=${reservation.id}"
        style="display: inline-block; background: #C85A4A; color: white; padding: 16px 40px; border-radius: 30px; text-decoration: none; font-size: 16px; font-weight: 500;">
       ✅ Confirmar y añadir al calendario
     </a>

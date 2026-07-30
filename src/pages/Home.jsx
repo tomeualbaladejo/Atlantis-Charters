@@ -102,13 +102,13 @@ export default function Home() {
     // Ensure canonical is set
     let canonical = document.querySelector('link[rel="canonical"]')
     if (canonical) {
-      canonical.href = 'https://atlantis-charters.vercel.app/'
+      canonical.href = (import.meta.env.VITE_PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app') + '/'
     }
 
     // Update OG tags
     document.querySelector('meta[property="og:title"]')?.setAttribute('content', 'Alquiler de Barco en Port de Pollença con Patrón | Atlantis Charters Mallorca')
     document.querySelector('meta[property="og:description"]')?.setAttribute('content', 'Alquiler de barco tradicional mallorquín (llaut) en Port de Pollença con patrón. Salidas de mañana, tarde, atardecer y día completo. Snorkel, paddle surf y tapas incluidos.')
-    document.querySelector('meta[property="og:url"]')?.setAttribute('content', 'https://atlantis-charters.vercel.app/')
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', (import.meta.env.VITE_PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app') + '/')
 
     // Update Twitter tags
     document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', 'Alquiler de Barco en Port de Pollença con Patrón | Atlantis Charters Mallorca')

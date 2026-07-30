@@ -293,12 +293,12 @@ export default function Destinos() {
       canonical.rel = 'canonical'
       document.head.appendChild(canonical)
     }
-    canonical.href = 'https://atlantis-charters.vercel.app/destinos'
+    canonical.href = (import.meta.env.VITE_PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app') + '/destinos'
 
     // Set OG tags
     document.querySelector('meta[property="og:title"]')?.setAttribute('content', 'Destinos y Calas en Barco desde Port de Pollença | Atlantis Charters')
     document.querySelector('meta[property="og:description"]')?.setAttribute('content', 'Descubre las mejores calas y rutas en barco desde Port de Pollença, Mallorca. Cala Figuera, Formentor y más destinos exclusivos con Atlantis Charters.')
-    document.querySelector('meta[property="og:url"]')?.setAttribute('content', 'https://atlantis-charters.vercel.app/destinos')
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', (import.meta.env.VITE_PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app') + '/destinos')
 
     // Set Twitter tags
     document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', 'Destinos y Calas en Barco desde Port de Pollença | Atlantis Charters')

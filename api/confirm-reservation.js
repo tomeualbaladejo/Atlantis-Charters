@@ -228,7 +228,7 @@ export default async function handler(req, res) {
           },
           body: JSON.stringify({
             from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
-            to: ['tomeualbaladejo@gmail.com'],
+            to: [process.env.CAPTAIN_EMAIL || 'Atlantis.charter.mallorca@gmail.com'],
             subject: `📋 REENVIAR AL CLIENTE: Confirmación para ${reservation.name} (${reservation.email})`,
             html: `
 <div style="background: #FFF3CD; border-left: 4px solid #FFA500; padding: 20px; margin-bottom: 20px;">
@@ -281,7 +281,7 @@ ${confirmationEmailHtml}
             <p>👥 ${reservation.passengers} pasajeros</p>
           </div>
           ${googleEventId ? '<p class="calendar-success">✅ El evento ha sido añadido automáticamente a tu Google Calendar</p>' : '<p style="color: #FF6B6B; font-size: 13px;">⚠️ No se pudo crear el evento en Google Calendar automáticamente</p>'}
-          <a href="https://atlantis-charters.vercel.app/admin">Ver panel de administración</a>
+          <a href="${process.env.PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app'}/admin">Ver panel de administración</a>
         </div>
       </body>
       </html>

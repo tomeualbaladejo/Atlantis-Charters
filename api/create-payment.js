@@ -9,6 +9,7 @@ const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
+const APP_URL = process.env.PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app';
 
 const PRICES = {
   morning:   { total: 520, deposit: 104, label: 'Medio día mañana (10:00 - 14:00)' },
@@ -109,7 +110,7 @@ export default async function handler(req, res) {
           product_data: {
             name: `Atlantis Charters — ${price.label}`,
             description: `${dateFormatted} · ${passengersNum} pasajeros · Depósito 20% (resto se paga a bordo)`,
-            images: ['https://atlantis-charters.vercel.app/images/logo-atlantis.png']
+            images: [`${APP_URL}/images/logo-atlantis.png`]
           },
           unit_amount: price.deposit * 100 // Stripe uses cents
         },
@@ -124,8 +125,8 @@ export default async function handler(req, res) {
         phone,
         passengers: String(passengersNum)
       },
-      success_url: `https://atlantis-charters.vercel.app/payment-success.html?session_id={CHECKOUT_SESSION_ID}&reservation_id=${reservation.id}`,
-      cancel_url: `https://atlantis-charters.vercel.app/?payment=cancelled&reservation_id=${reservation.id}`
+      success_url: `${APP_URL}/payment-success.html?session_id={CHECKOUT_SESSION_ID}&reservation_id=${reservation.id}`,
+      cancel_url: `${APP_URL}/?payment=cancelled&reservation_id=${reservation.id}`
     });
 
     console.log('Stripe checkout created:', checkoutSession.id, 'for reservation:', reservation.id);

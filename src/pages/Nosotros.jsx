@@ -67,12 +67,12 @@ export default function Nosotros() {
       canonical.rel = 'canonical'
       document.head.appendChild(canonical)
     }
-    canonical.href = 'https://atlantis-charters.vercel.app/nosotros'
+    canonical.href = (import.meta.env.VITE_PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app') + '/nosotros'
 
     // Set OG tags
     document.querySelector('meta[property="og:title"]')?.setAttribute('content', 'Sobre Nosotros | Capitán Federico | Atlantis Charters Port de Pollença')
     document.querySelector('meta[property="og:description"]')?.setAttribute('content', 'Conoce al capitán Federico y el equipo de Atlantis Charters. Más de 10 años de experiencia navegando las aguas de Mallorca en barco tradicional mallorquín.')
-    document.querySelector('meta[property="og:url"]')?.setAttribute('content', 'https://atlantis-charters.vercel.app/nosotros')
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', (import.meta.env.VITE_PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app') + '/nosotros')
 
     // Set Twitter tags
     document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', 'Sobre Nosotros | Capitán Federico | Atlantis Charters Port de Pollença')
