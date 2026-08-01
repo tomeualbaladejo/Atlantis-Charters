@@ -152,6 +152,11 @@ export default function Nosotros() {
               variants={fadeUp}
               dangerouslySetInnerHTML={{ __html: t('nos.story.3') }}
             />
+            <motion.p
+              className="story-body"
+              variants={fadeUp}
+              dangerouslySetInnerHTML={{ __html: t('nos.story.4') }}
+            />
             <motion.div variants={fadeUp}>
               <button className="story-cta" onClick={goReservar}>
                 {t('nos.story.cta')}
