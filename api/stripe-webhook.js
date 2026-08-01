@@ -3,6 +3,7 @@
 
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { calcPrice } from './_pricing.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const supabase = createClient(
@@ -67,14 +68,7 @@ export default async function handler(req, res) {
     }
 
     if (reservation) {
-      const PRICES = {
-        morning:   { total: 520, deposit: 104, label: 'Medio día mañana (10:00 - 14:00)' },
-        afternoon: { total: 520, deposit: 104, label: 'Medio día tarde (14:30 - 18:30)' },
-        sunset:    { total: 350, deposit: 70,  label: 'Atardecer (19:00 - 21:30)' },
-        fullday:   { total: 620, deposit: 124, label: 'Día completo (14:30 - 20:30)' }
-      };
-
-      const price = PRICES[reservation.session];
+      const price = calcPrice(reservation.session, reservation.passengers);
       const dateFormatted = new Date(reservation.date + 'T00:00:00').toLocaleDateString('es-ES', {
         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
       });

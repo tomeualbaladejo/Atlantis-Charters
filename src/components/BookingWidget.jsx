@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '../contexts/LanguageContext'
+import { calcPrice } from '../../api/_pricing.js'
 
 const API_BASE = '/api'
 
@@ -476,13 +477,8 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
             disabled={submitting}
           >
             {submitting ? t('booking.submitting') : (() => {
-              const prices = {
-                morning: { deposit: 104, total: 520 },
-                afternoon: { deposit: 104, total: 520 },
-                sunset: { deposit: 70, total: 350 },
-                fullday: { deposit: 124, total: 620 }
-              }
-              const price = prices[selectedSession] || { deposit: 104, total: 520 }
+              const pax = parseInt(formData.passengers) || 4
+              const price = calcPrice(selectedSession, pax) || calcPrice('morning', 4)
               return `${t('booking.submit')} — ${price.deposit}€ / ${price.total}€`
             })()}
           </button>

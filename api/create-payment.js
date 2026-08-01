@@ -1,8 +1,9 @@
 // Vercel Serverless Function: Create Stripe payment session
-// Creates a Checkout Session for 20% deposit and saves reservation as 'payment_pending'
+// Creates a Checkout Session for a 30% deposit and saves reservation as 'payment_pending'
 
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { calcPrice, DEPOSIT_PCT_LABEL } from './_pricing.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const supabase = createClient(
@@ -10,13 +11,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 const APP_URL = process.env.PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app';
-
-const PRICES = {
-  morning:   { total: 520, deposit: 104, label: 'Medio día mañana (10:00 - 14:00)' },
-  afternoon: { total: 520, deposit: 104, label: 'Medio día tarde (14:30 - 18:30)' },
-  sunset:    { total: 350, deposit: 70,  label: 'Atardecer (19:00 - 21:30)' },
-  fullday:   { total: 620, deposit: 124, label: 'Día completo (14:30 - 20:30)' }
-};
 
 export default async function handler(req, res) {
   // CORS headers
@@ -44,15 +38,16 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const price = PRICES[session];
-  if (!price) {
-    return res.status(400).json({ error: 'Invalid session' });
-  }
-
   // Validate passengers
   const passengersNum = parseInt(passengers);
   if (isNaN(passengersNum) || passengersNum < 1 || passengersNum > 6) {
     return res.status(400).json({ error: 'Passengers must be between 1 and 6' });
+  }
+
+  // Server-side price computation (never trust client-sent amounts)
+  const price = calcPrice(session, passengersNum);
+  if (!price) {
+    return res.status(400).json({ error: 'Invalid session' });
   }
 
   try {
@@ -109,7 +104,7 @@ export default async function handler(req, res) {
           currency: 'eur',
           product_data: {
             name: `Atlantis Charters — ${price.label}`,
-            description: `${dateFormatted} · ${passengersNum} pasajeros · Depósito 20% (resto se paga a bordo)`,
+            description: `${dateFormatted} · ${passengersNum} pasajeros · Depósito ${DEPOSIT_PCT_LABEL} (resto se paga a bordo)`,
             images: [`${APP_URL}/images/logo-atlantis.png`]
           },
           unit_amount: price.deposit * 100 // Stripe uses cents

@@ -5,6 +5,12 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useLanguage } from '../contexts/LanguageContext'
 import { useBooking } from '../contexts/BookingContext'
+import { calcPrice } from '../../api/_pricing.js'
+
+const basePriceBadge = (sessionKey) => {
+  const p = calcPrice(sessionKey, 4)
+  return `${p.deposit}€ depósito · Total ${p.total}€`
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -237,7 +243,7 @@ export default function Home() {
             <motion.article className="plan-card" variants={fadeUp}>
               <div className="plan-image-wrapper">
                 <img src="/images/mañana.jpg" alt="Salida de mañana" className="plan-image" />
-                <div className="plan-price-badge">104€ depósito · Total 520€</div>
+                <div className="plan-price-badge">{basePriceBadge('morning')}</div>
               </div>
               <div className="plan-content">
                 <h3 className="plan-title">Mañana | 4 horas</h3>
@@ -262,7 +268,7 @@ export default function Home() {
             <motion.article className="plan-card" variants={fadeUp}>
               <div className="plan-image-wrapper">
                 <img src="/images/medio-dia.jpg" alt="Medio día" className="plan-image" />
-                <div className="plan-price-badge">114€ depósito · Total 570€</div>
+                <div className="plan-price-badge">{basePriceBadge('halfday')}</div>
               </div>
               <div className="plan-content">
                 <h3 className="plan-title">Medio Día | 6 horas</h3>
@@ -287,7 +293,7 @@ export default function Home() {
             <motion.article className="plan-card" variants={fadeUp}>
               <div className="plan-image-wrapper">
                 <img src="/images/la-victoria/main.la-victoria.png" alt="Día completo" className="plan-image" />
-                <div className="plan-price-badge">124€ depósito · Total 620€</div>
+                <div className="plan-price-badge">{basePriceBadge('fullday')}</div>
               </div>
               <div className="plan-content">
                 <h3 className="plan-title">Día Completo | 8 horas</h3>
@@ -312,7 +318,7 @@ export default function Home() {
             <motion.article className="plan-card" variants={fadeUp}>
               <div className="plan-image-wrapper">
                 <img src="/images/tarde.jpg" alt="Salida de tarde" className="plan-image" />
-                <div className="plan-price-badge">104€ depósito · Total 520€</div>
+                <div className="plan-price-badge">{basePriceBadge('afternoon')}</div>
               </div>
               <div className="plan-content">
                 <h3 className="plan-title">Tarde | 4 horas</h3>
@@ -337,7 +343,7 @@ export default function Home() {
             <motion.article className="plan-card" variants={fadeUp}>
               <div className="plan-image-wrapper">
                 <img src="/images/atardecer.jpg" alt="Salida al atardecer" className="plan-image" />
-                <div className="plan-price-badge">70€ depósito · Total 350€</div>
+                <div className="plan-price-badge">{basePriceBadge('sunset')}</div>
               </div>
               <div className="plan-content">
                 <h3 className="plan-title">Atardecer | 2.5 horas</h3>
