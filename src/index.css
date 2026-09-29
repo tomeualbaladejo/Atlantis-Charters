@@ -2112,10 +2112,6 @@ button, input, select, textarea { font-family: var(--font-body); }
   .calendly-card {
     padding: 20px 16px;
   }
-  .booking-session-options {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
   .booking-session-btn {
     padding: 14px 10px;
   }
@@ -2638,11 +2634,34 @@ button, input, select, textarea { font-family: var(--font-body); }
   margin-bottom: 16px;
 }
 
+/* Five sessions: three 10:00 departures on the first row, afternoon + sunset on the second */
 .booking-session-options {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 12px;
   margin-bottom: 20px;
+}
+
+.booking-session-options > .booking-session-btn {
+  grid-column: span 2;
+}
+
+.booking-session-options > .booking-session-btn:nth-child(n + 4) {
+  grid-column: span 3;
+}
+
+@media (max-width: 600px) {
+  .booking-session-options {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .booking-session-options > .booking-session-btn,
+  .booking-session-options > .booking-session-btn:nth-child(n + 4) {
+    grid-column: auto;
+  }
+  .booking-session-options > .booking-session-btn:last-child {
+    grid-column: 1 / -1;
+  }
 }
 
 .booking-session-btn {
