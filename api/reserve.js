@@ -2,6 +2,7 @@
 // Saves to Supabase and sends confirmation emails via Resend
 
 import { createClient } from '@supabase/supabase-js';
+import { SESSIONS, SESSION_KEYS, overlappingSessions } from './_pricing.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -38,8 +39,8 @@ export default async function handler(req, res) {
   }
 
   // Validate session value
-  if (!['morning', 'afternoon', 'sunset', 'fullday'].includes(session)) {
-    return res.status(400).json({ error: 'Invalid session. Must be "morning", "afternoon", "sunset", or "fullday"' });
+  if (!SESSIONS[session]) {
+    return res.status(400).json({ error: `Invalid session. Must be one of: ${SESSION_KEYS.join(', ')}` });
   }
 
   // Validate passengers
@@ -49,12 +50,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Check availability — make sure slot isn't already taken
+    // Check availability — reject if any confirmed booking overlaps this session
     const { data: existing, error: checkError } = await supabase
       .from('reservations')
       .select('id')
       .eq('date', date)
-      .eq('session', session)
+      .in('session', overlappingSessions(session))
       .eq('status', 'confirmed');
 
     if (checkError) {
@@ -91,31 +92,9 @@ export default async function handler(req, res) {
     }
 
     // Format session details for emails
-    const sessionLabels = {
-      morning: 'Medio día mañana (10:00 - 14:00)',
-      afternoon: 'Medio día tarde (14:30 - 18:30)',
-      sunset: 'Atardecer (19:00 - 21:30)',
-      fullday: 'Día completo (14:30 - 20:30)'
-    };
-
-    const sessionLabelsEN = {
-      morning: 'Morning (10:00 - 14:00)',
-      afternoon: 'Afternoon (14:30 - 18:30)',
-      sunset: 'Sunset (19:00 - 21:30)',
-      fullday: 'Full day (14:30 - 20:30)'
-    };
-
-    const sessionLabel = sessionLabels[session] || sessionLabels.morning;
-    const sessionLabelEN = sessionLabelsEN[session] || sessionLabelsEN.morning;
+    const sessionLabel = SESSIONS[session].label;
 
     const dateFormatted = new Date(date + 'T00:00:00').toLocaleDateString('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-
-    const dateFormattedEN = new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',

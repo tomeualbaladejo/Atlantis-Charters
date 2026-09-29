@@ -2,6 +2,7 @@
 // Protected endpoint for captain only
 
 import { createClient } from '@supabase/supabase-js';
+import { SESSIONS } from './_pricing.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -63,9 +64,7 @@ export default async function handler(req, res) {
 
     // Send cancellation email to client if requested
     if (sendEmail && reservation.email) {
-      const sessionLabel = reservation.session === 'morning'
-        ? 'Mañana (09:00 - 14:00)'
-        : 'Atardecer (15:00 - 20:00)';
+      const sessionLabel = SESSIONS[reservation.session]?.label || reservation.session;
 
       const dateFormatted = new Date(reservation.date + 'T00:00:00').toLocaleDateString('es-ES', {
         weekday: 'long',

@@ -3,7 +3,7 @@
 
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
-import { calcPrice, DEPOSIT_PCT_LABEL } from './_pricing.js';
+import { calcPrice, overlappingSessions, DEPOSIT_PCT_LABEL } from './_pricing.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const supabase = createClient(
@@ -51,12 +51,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Check availability
+    // Check availability — reject if any active booking overlaps this session
+    // (e.g. a morning booking blocks halfday and fullday)
     const { data: existing, error: checkError } = await supabase
       .from('reservations')
       .select('id')
       .eq('date', date)
-      .eq('session', session)
+      .in('session', overlappingSessions(session))
       .in('status', ['payment_pending', 'pending', 'confirmed']);
 
     if (checkError) {

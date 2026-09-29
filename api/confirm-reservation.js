@@ -4,6 +4,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { getGoogleAccessToken } from './_google-auth.js';
+import { SESSIONS, TIMEZONE } from './_pricing.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -40,23 +41,14 @@ export default async function handler(req, res) {
     }
 
     // Session details
-    const sessionLabels = {
-      morning: 'Medio día mañana (10:00 - 14:00)',
-      afternoon: 'Medio día tarde (14:30 - 18:30)',
-      sunset: 'Atardecer (19:00 - 21:30)',
-      fullday: 'Día completo (14:30 - 20:30)'
-    };
-
-    const sessionTimes = {
-      morning: { start: '10:00', end: '14:00' },
-      afternoon: { start: '14:30', end: '18:30' },
-      sunset: { start: '19:00', end: '21:30' },
-      fullday: { start: '14:30', end: '20:30' }
-    };
-
-    const sessionLabel = sessionLabels[reservation.session] || sessionLabels.morning;
-    const startTime = sessionTimes[reservation.session]?.start || '10:00';
-    const endTime = sessionTimes[reservation.session]?.end || '14:00';
+    const sessionCfg = SESSIONS[reservation.session];
+    if (!sessionCfg) {
+      console.error('Unknown session on reservation:', reservation.id, reservation.session);
+      return res.status(500).send('<h1>Sesión desconocida en la reserva</h1>');
+    }
+    const sessionLabel = sessionCfg.label;
+    const startTime = sessionCfg.start;
+    const endTime = sessionCfg.end;
 
     const dateFormatted = new Date(reservation.date + 'T00:00:00').toLocaleDateString('es-ES', {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
@@ -77,15 +69,15 @@ export default async function handler(req, res) {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              summary: `⛵ Atlantis — ${reservation.name} (${sessionLabel.split('(')[0].trim()})`,
+              summary: `⛵ Atlantis — ${reservation.name} (${sessionCfg.name})`,
               description: `Reserva Atlantis Charters\n\nCliente: ${reservation.name}\nEmail: ${reservation.email}\nTeléfono: ${reservation.phone}\nPasajeros: ${reservation.passengers}${reservation.message ? `\nMensaje: ${reservation.message}` : ''}`,
               start: {
                 dateTime: `${reservation.date}T${startTime}:00`,
-                timeZone: 'Europe/Madrid'
+                timeZone: TIMEZONE
               },
               end: {
                 dateTime: `${reservation.date}T${endTime}:00`,
-                timeZone: 'Europe/Madrid'
+                timeZone: TIMEZONE
               },
               location: 'W36Q+CH6, 07470 Port de Pollença, Illes Balears'
             })
