@@ -2634,7 +2634,8 @@ button, input, select, textarea { font-family: var(--font-body); }
   margin-bottom: 16px;
 }
 
-/* Five sessions: three 10:00 departures on the first row, afternoon + sunset on the second */
+/* Five sessions: three 10:00 departures on the first row, afternoon + sunset on the second.
+   Four sessions (half day switched off): 2 x 2. */
 .booking-session-options {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -2646,7 +2647,9 @@ button, input, select, textarea { font-family: var(--font-body); }
   grid-column: span 2;
 }
 
-.booking-session-options > .booking-session-btn:nth-child(n + 4) {
+.booking-session-options > .booking-session-btn:nth-child(n + 4),
+.booking-session-options > .booking-session-btn:first-child:nth-last-child(4),
+.booking-session-options > .booking-session-btn:first-child:nth-last-child(4) ~ .booking-session-btn {
   grid-column: span 3;
 }
 
@@ -2656,10 +2659,12 @@ button, input, select, textarea { font-family: var(--font-body); }
     gap: 10px;
   }
   .booking-session-options > .booking-session-btn,
-  .booking-session-options > .booking-session-btn:nth-child(n + 4) {
+  .booking-session-options > .booking-session-btn:nth-child(n + 4),
+  .booking-session-options > .booking-session-btn:first-child:nth-last-child(4),
+  .booking-session-options > .booking-session-btn:first-child:nth-last-child(4) ~ .booking-session-btn {
     grid-column: auto;
   }
-  .booking-session-options > .booking-session-btn:last-child {
+  .booking-session-options > .booking-session-btn:last-child:nth-child(odd) {
     grid-column: 1 / -1;
   }
 }
