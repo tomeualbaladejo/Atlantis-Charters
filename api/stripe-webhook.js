@@ -4,6 +4,7 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { calcPrice } from './_pricing.js';
+import { escapeHtml, confirmButtonHtml } from './_security.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const supabase = createClient(
@@ -92,23 +93,20 @@ export default async function handler(req, res) {
 
   <div style="background: #F5F0E8; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
     <table style="width: 100%; border-collapse: collapse;">
-      <tr><td style="padding: 8px 0; color: #6B6860; width: 150px;">Nombre</td><td style="padding: 8px 0; font-weight: bold;">${reservation.name}</td></tr>
-      <tr><td style="padding: 8px 0; color: #6B6860;">Email</td><td style="padding: 8px 0;"><a href="mailto:${reservation.email}" style="color: #C85A4A;">${reservation.email}</a></td></tr>
-      <tr><td style="padding: 8px 0; color: #6B6860;">Teléfono</td><td style="padding: 8px 0;"><a href="tel:${reservation.phone}" style="color: #C85A4A;">${reservation.phone}</a></td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860; width: 150px;">Nombre</td><td style="padding: 8px 0; font-weight: bold;">${escapeHtml(reservation.name)}</td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860;">Email</td><td style="padding: 8px 0;"><a href="mailto:${escapeHtml(reservation.email)}" style="color: #C85A4A;">${escapeHtml(reservation.email)}</a></td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860;">Teléfono</td><td style="padding: 8px 0;"><a href="tel:${escapeHtml(reservation.phone)}" style="color: #C85A4A;">${escapeHtml(reservation.phone)}</a></td></tr>
       <tr><td style="padding: 8px 0; color: #6B6860;">Fecha</td><td style="padding: 8px 0; font-weight: bold;">${dateFormatted}</td></tr>
       <tr><td style="padding: 8px 0; color: #6B6860;">Sesión</td><td style="padding: 8px 0; font-weight: bold; color: #C85A4A;">${price.label}</td></tr>
       <tr><td style="padding: 8px 0; color: #6B6860;">Pasajeros</td><td style="padding: 8px 0;">${reservation.passengers}</td></tr>
       <tr><td style="padding: 8px 0; color: #6B6860;">Depósito pagado</td><td style="padding: 8px 0; font-weight: bold; color: #2E7D32;">${price.deposit}€</td></tr>
       <tr><td style="padding: 8px 0; color: #6B6860;">Resto a cobrar</td><td style="padding: 8px 0; font-weight: bold;">${price.total - price.deposit}€ (a bordo)</td></tr>
-      ${reservation.message ? `<tr><td style="padding: 8px 0; color: #6B6860;">Mensaje</td><td style="padding: 8px 0;">${reservation.message}</td></tr>` : ''}
+      ${reservation.message ? `<tr><td style="padding: 8px 0; color: #6B6860;">Mensaje</td><td style="padding: 8px 0;">${escapeHtml(reservation.message)}</td></tr>` : ''}
     </table>
   </div>
 
   <div style="text-align: center; margin: 32px 0;">
-    <a href="${process.env.PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app'}/api/confirm-reservation?id=${reservation.id}&token=${reservation.id}"
-       style="display: inline-block; background: #C85A4A; color: white; padding: 16px 40px; border-radius: 30px; text-decoration: none; font-size: 16px; font-weight: 500;">
-      ✅ Confirmar y añadir al calendario
-    </a>
+    ${confirmButtonHtml(reservation.id, '✅ Confirmar y añadir al calendario')}
   </div>
 
   <p style="text-align: center; color: #6B6860; font-size: 13px;">

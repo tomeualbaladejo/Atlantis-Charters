@@ -2,6 +2,8 @@
 // Saves to Supabase and sends confirmation emails via Resend
 
 import { createClient } from '@supabase/supabase-js';
+import { SESSIONS, SESSION_KEYS, overlappingSessions } from './_pricing.js';
+import { escapeHtml, confirmButtonHtml } from './_security.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -38,8 +40,8 @@ export default async function handler(req, res) {
   }
 
   // Validate session value
-  if (!['morning', 'afternoon', 'sunset', 'fullday'].includes(session)) {
-    return res.status(400).json({ error: 'Invalid session. Must be "morning", "afternoon", "sunset", or "fullday"' });
+  if (!SESSIONS[session]) {
+    return res.status(400).json({ error: `Invalid session. Must be one of: ${SESSION_KEYS.join(', ')}` });
   }
 
   // Validate passengers
@@ -49,12 +51,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Check availability — make sure slot isn't already taken
+    // Check availability — reject if any confirmed booking overlaps this session
     const { data: existing, error: checkError } = await supabase
       .from('reservations')
       .select('id')
       .eq('date', date)
-      .eq('session', session)
+      .in('session', overlappingSessions(session))
       .eq('status', 'confirmed');
 
     if (checkError) {
@@ -91,31 +93,9 @@ export default async function handler(req, res) {
     }
 
     // Format session details for emails
-    const sessionLabels = {
-      morning: 'Medio día mañana (10:00 - 14:00)',
-      afternoon: 'Medio día tarde (14:30 - 18:30)',
-      sunset: 'Atardecer (19:00 - 21:30)',
-      fullday: 'Día completo (14:30 - 20:30)'
-    };
-
-    const sessionLabelsEN = {
-      morning: 'Morning (10:00 - 14:00)',
-      afternoon: 'Afternoon (14:30 - 18:30)',
-      sunset: 'Sunset (19:00 - 21:30)',
-      fullday: 'Full day (14:30 - 20:30)'
-    };
-
-    const sessionLabel = sessionLabels[session] || sessionLabels.morning;
-    const sessionLabelEN = sessionLabelsEN[session] || sessionLabelsEN.morning;
+    const sessionLabel = SESSIONS[session].label;
 
     const dateFormatted = new Date(date + 'T00:00:00').toLocaleDateString('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-
-    const dateFormattedEN = new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -141,21 +121,18 @@ export default async function handler(req, res) {
 
   <div style="background: #F5F0E8; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
     <table style="width: 100%; border-collapse: collapse;">
-      <tr><td style="padding: 8px 0; color: #6B6860; width: 130px;">Nombre</td><td style="padding: 8px 0; font-weight: bold;">${name}</td></tr>
-      <tr><td style="padding: 8px 0; color: #6B6860;">Email</td><td style="padding: 8px 0;"><a href="mailto:${email}" style="color: #C85A4A;">${email}</a></td></tr>
-      <tr><td style="padding: 8px 0; color: #6B6860;">Teléfono</td><td style="padding: 8px 0;"><a href="tel:${phone}" style="color: #C85A4A;">${phone}</a></td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860; width: 130px;">Nombre</td><td style="padding: 8px 0; font-weight: bold;">${escapeHtml(name)}</td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860;">Email</td><td style="padding: 8px 0;"><a href="mailto:${escapeHtml(email)}" style="color: #C85A4A;">${escapeHtml(email)}</a></td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860;">Teléfono</td><td style="padding: 8px 0;"><a href="tel:${escapeHtml(phone)}" style="color: #C85A4A;">${escapeHtml(phone)}</a></td></tr>
       <tr><td style="padding: 8px 0; color: #6B6860;">Fecha</td><td style="padding: 8px 0; font-weight: bold;">${dateFormatted}</td></tr>
       <tr><td style="padding: 8px 0; color: #6B6860;">Sesión</td><td style="padding: 8px 0; font-weight: bold; color: #C85A4A;">${sessionLabel}</td></tr>
-      <tr><td style="padding: 8px 0; color: #6B6860;">Pasajeros</td><td style="padding: 8px 0;">${passengers}</td></tr>
-      ${message ? `<tr><td style="padding: 8px 0; color: #6B6860;">Mensaje</td><td style="padding: 8px 0;">${message}</td></tr>` : ''}
+      <tr><td style="padding: 8px 0; color: #6B6860;">Pasajeros</td><td style="padding: 8px 0;">${passengersNum}</td></tr>
+      ${message ? `<tr><td style="padding: 8px 0; color: #6B6860;">Mensaje</td><td style="padding: 8px 0;">${escapeHtml(message)}</td></tr>` : ''}
     </table>
   </div>
 
   <div style="text-align: center; margin-bottom: 24px;">
-    <a href="${process.env.PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app'}/api/confirm-reservation?id=${reservation.id}&token=${reservation.id}"
-       style="display: inline-block; background: #C85A4A; color: white; padding: 16px 40px; border-radius: 30px; text-decoration: none; font-size: 16px; font-weight: 500;">
-      ✅ Confirmar reserva
-    </a>
+    ${confirmButtonHtml(reservation.id, '✅ Confirmar reserva')}
   </div>
 
   <p style="text-align: center; color: #6B6860; font-size: 13px;">
