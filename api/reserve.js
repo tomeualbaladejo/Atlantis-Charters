@@ -3,6 +3,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { SESSIONS, SESSION_KEYS, overlappingSessions } from './_pricing.js';
+import { escapeHtml, confirmButtonHtml } from './_security.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -120,21 +121,18 @@ export default async function handler(req, res) {
 
   <div style="background: #F5F0E8; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
     <table style="width: 100%; border-collapse: collapse;">
-      <tr><td style="padding: 8px 0; color: #6B6860; width: 130px;">Nombre</td><td style="padding: 8px 0; font-weight: bold;">${name}</td></tr>
-      <tr><td style="padding: 8px 0; color: #6B6860;">Email</td><td style="padding: 8px 0;"><a href="mailto:${email}" style="color: #C85A4A;">${email}</a></td></tr>
-      <tr><td style="padding: 8px 0; color: #6B6860;">Teléfono</td><td style="padding: 8px 0;"><a href="tel:${phone}" style="color: #C85A4A;">${phone}</a></td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860; width: 130px;">Nombre</td><td style="padding: 8px 0; font-weight: bold;">${escapeHtml(name)}</td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860;">Email</td><td style="padding: 8px 0;"><a href="mailto:${escapeHtml(email)}" style="color: #C85A4A;">${escapeHtml(email)}</a></td></tr>
+      <tr><td style="padding: 8px 0; color: #6B6860;">Teléfono</td><td style="padding: 8px 0;"><a href="tel:${escapeHtml(phone)}" style="color: #C85A4A;">${escapeHtml(phone)}</a></td></tr>
       <tr><td style="padding: 8px 0; color: #6B6860;">Fecha</td><td style="padding: 8px 0; font-weight: bold;">${dateFormatted}</td></tr>
       <tr><td style="padding: 8px 0; color: #6B6860;">Sesión</td><td style="padding: 8px 0; font-weight: bold; color: #C85A4A;">${sessionLabel}</td></tr>
-      <tr><td style="padding: 8px 0; color: #6B6860;">Pasajeros</td><td style="padding: 8px 0;">${passengers}</td></tr>
-      ${message ? `<tr><td style="padding: 8px 0; color: #6B6860;">Mensaje</td><td style="padding: 8px 0;">${message}</td></tr>` : ''}
+      <tr><td style="padding: 8px 0; color: #6B6860;">Pasajeros</td><td style="padding: 8px 0;">${passengersNum}</td></tr>
+      ${message ? `<tr><td style="padding: 8px 0; color: #6B6860;">Mensaje</td><td style="padding: 8px 0;">${escapeHtml(message)}</td></tr>` : ''}
     </table>
   </div>
 
   <div style="text-align: center; margin-bottom: 24px;">
-    <a href="${process.env.PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app'}/api/confirm-reservation?id=${reservation.id}&token=${reservation.id}"
-       style="display: inline-block; background: #C85A4A; color: white; padding: 16px 40px; border-radius: 30px; text-decoration: none; font-size: 16px; font-weight: 500;">
-      ✅ Confirmar reserva
-    </a>
+    ${confirmButtonHtml(reservation.id, '✅ Confirmar reserva')}
   </div>
 
   <p style="text-align: center; color: #6B6860; font-size: 13px;">

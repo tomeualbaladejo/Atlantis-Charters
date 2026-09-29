@@ -5,6 +5,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { getGoogleAccessToken } from './_google-auth.js';
 import { SESSIONS, TIMEZONE } from './_pricing.js';
+import { escapeHtml, verifyConfirmToken } from './_security.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -14,8 +15,13 @@ const supabase = createClient(
 export default async function handler(req, res) {
   const { id, token } = req.query;
 
-  // Simple validation (using id as token for now)
-  if (!id || token !== id) {
+  if (!process.env.CONFIRM_LINK_SECRET) {
+    console.error('CONFIRM_LINK_SECRET is not set — cannot verify confirmation links');
+    return res.status(500).send('<h1>Error de configuración del servidor</h1>');
+  }
+
+  // token must be the HMAC of the id (see _security.js)
+  if (!id || !verifyConfirmToken(id, token)) {
     return res.status(400).send('<h1>Link inválido</h1>');
   }
 
@@ -35,7 +41,7 @@ export default async function handler(req, res) {
       return res.send(`
         <html><body style="font-family:Arial;text-align:center;padding:80px;">
           <h2 style="color:#2E7D32;">✅ Esta reserva ya estaba confirmada</h2>
-          <p>${reservation.name} · ${reservation.date}</p>
+          <p>${escapeHtml(reservation.name)} · ${escapeHtml(reservation.date)}</p>
         </body></html>
       `);
     }
@@ -123,10 +129,10 @@ export default async function handler(req, res) {
   <div style="background: #F5F0E8; border-radius: 16px; padding: 32px; margin-bottom: 24px;">
     <h2 style="color: #1C1C1A; font-size: 22px; margin: 0 0 24px;">¡Tu reserva está confirmada! ⛵</h2>
     <table style="width: 100%; border-collapse: collapse;">
-      <tr><td style="padding: 10px 0; color: #6B6860; width: 140px; border-bottom: 1px solid #E8E0CC;">Nombre</td><td style="padding: 10px 0; font-weight: bold; border-bottom: 1px solid #E8E0CC;">${reservation.name}</td></tr>
+      <tr><td style="padding: 10px 0; color: #6B6860; width: 140px; border-bottom: 1px solid #E8E0CC;">Nombre</td><td style="padding: 10px 0; font-weight: bold; border-bottom: 1px solid #E8E0CC;">${escapeHtml(reservation.name)}</td></tr>
       <tr><td style="padding: 10px 0; color: #6B6860; border-bottom: 1px solid #E8E0CC;">Fecha</td><td style="padding: 10px 0; font-weight: bold; border-bottom: 1px solid #E8E0CC;">${dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1)}</td></tr>
       <tr><td style="padding: 10px 0; color: #6B6860; border-bottom: 1px solid #E8E0CC;">Horario</td><td style="padding: 10px 0; font-weight: bold; color: #C85A4A; border-bottom: 1px solid #E8E0CC;">${sessionLabel}</td></tr>
-      <tr><td style="padding: 10px 0; color: #6B6860; border-bottom: 1px solid #E8E0CC;">Pasajeros</td><td style="padding: 10px 0; border-bottom: 1px solid #E8E0CC;">${reservation.passengers} personas</td></tr>
+      <tr><td style="padding: 10px 0; color: #6B6860; border-bottom: 1px solid #E8E0CC;">Pasajeros</td><td style="padding: 10px 0; border-bottom: 1px solid #E8E0CC;">${escapeHtml(reservation.passengers)} personas</td></tr>
       <tr><td style="padding: 10px 0; color: #6B6860;">Punto de salida</td><td style="padding: 10px 0;">W36Q+CH6, 07470 Port de Pollença</td></tr>
     </table>
   </div>
@@ -178,7 +184,7 @@ export default async function handler(req, res) {
 <div style="background: #FFF3CD; border-left: 4px solid #FFA500; padding: 20px; margin-bottom: 20px;">
   <p style="margin: 0; font-weight: bold; color: #856404;">⚠️ MODO TEST</p>
   <p style="margin: 10px 0 0 0; color: #856404;">
-    Este email debería ir a <strong>${reservation.email}</strong><br>
+    Este email debería ir a <strong>${escapeHtml(reservation.email)}</strong><br>
     Por favor reenvíaselo manualmente hasta que se verifique el dominio en Resend.
   </p>
 </div>
@@ -219,10 +225,10 @@ ${confirmationEmailHtml}
           <h1>¡Reserva confirmada!</h1>
           <p>Se ha enviado el email de confirmación al cliente.</p>
           <div class="detail">
-            <p><strong>${reservation.name}</strong></p>
+            <p><strong>${escapeHtml(reservation.name)}</strong></p>
             <p>📅 ${dateFormatted}</p>
             <p>⛵ ${sessionLabel}</p>
-            <p>👥 ${reservation.passengers} pasajeros</p>
+            <p>👥 ${escapeHtml(reservation.passengers)} pasajeros</p>
           </div>
           ${googleEventId ? '<p class="calendar-success">✅ El evento ha sido añadido automáticamente a tu Google Calendar</p>' : '<p style="color: #FF6B6B; font-size: 13px;">⚠️ No se pudo crear el evento en Google Calendar automáticamente</p>'}
           <a href="${process.env.PUBLIC_APP_URL || 'https://atlantis-charters.vercel.app'}/admin">Ver panel de administración</a>
