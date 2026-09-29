@@ -6,6 +6,7 @@ import Footer from '../components/Footer'
 import { useLanguage } from '../contexts/LanguageContext'
 import { useBooking } from '../contexts/BookingContext'
 import { calcPrice } from '../../api/_pricing.js'
+import { sessionTimeRange } from '../lib/sessions.js'
 
 const basePriceBadge = (sessionKey) => {
   const p = calcPrice(sessionKey, 4)
@@ -249,7 +250,7 @@ export default function Home() {
                 <h3 className="plan-title">Mañana | 4 horas</h3>
                 <div className="plan-hours">
                   <svg className="plan-clock-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  10:00 – 14:00
+                  {sessionTimeRange('morning')}
                 </div>
                 <p className="plan-description">
                   La salida matinal. Aguas tranquilas y luz suave para empezar el día navegando.
@@ -274,7 +275,7 @@ export default function Home() {
                 <h3 className="plan-title">Medio Día | 6 horas</h3>
                 <div className="plan-hours">
                   <svg className="plan-clock-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  10:00 – 16:00
+                  {sessionTimeRange('halfday')}
                 </div>
                 <p className="plan-description">
                   El equilibrio perfecto. Más tiempo que la media jornada para descubrir varias calas con calma.
@@ -299,7 +300,7 @@ export default function Home() {
                 <h3 className="plan-title">Día Completo | 8 horas</h3>
                 <div className="plan-hours">
                   <svg className="plan-clock-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  10:00 – 18:00
+                  {sessionTimeRange('fullday')}
                 </div>
                 <p className="plan-description">
                   La experiencia completa. Desde la Fortaleza hasta las calas más remotas del Cap de Formentor.
@@ -324,7 +325,7 @@ export default function Home() {
                 <h3 className="plan-title">Tarde | 4 horas</h3>
                 <div className="plan-hours">
                   <svg className="plan-clock-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  14:30 – 18:30
+                  {sessionTimeRange('afternoon')}
                 </div>
                 <p className="plan-description">
                   La tarde perfecta en el mar. Baño, snorkel y las mejores calas bajo el sol de la tarde.
@@ -349,7 +350,7 @@ export default function Home() {
                 <h3 className="plan-title">Atardecer | 2.5 horas</h3>
                 <div className="plan-hours">
                   <svg className="plan-clock-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  19:00 – 21:30
+                  {sessionTimeRange('sunset')}
                 </div>
                 <p className="plan-description">
                   La escapada perfecta al final del día. Navega hacia el atardecer con tapas y vino mallorquín.

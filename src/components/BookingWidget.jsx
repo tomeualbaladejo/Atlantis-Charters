@@ -2,8 +2,16 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '../contexts/LanguageContext'
 import { calcPrice } from '../../api/_pricing.js'
+import { SESSION_KEYS, sessionTimeRange } from '../lib/sessions.js'
 
 const API_BASE = '/api'
+const DATE_LOCALES = { es: 'es-ES', en: 'en-GB', de: 'de-DE', fr: 'fr-FR' }
+const WEEKDAYS = {
+  es: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+  en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  de: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
+  fr: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+}
 
 // Calendar helper functions
 const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate()
@@ -13,6 +21,7 @@ const formatDate = (year, month, day) =>
 
 export default function BookingWidget({ isOpen, onClose, initialSession = '' }) {
   const { t, lang } = useLanguage()
+  const locale = DATE_LOCALES[lang] || 'es-ES'
 
   // Calendar state
   const today = new Date()
@@ -109,20 +118,18 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
     // Can't book past dates
     if (dateObj < todayStart) return false
 
-    // Check if specific session is booked
-    const slots = bookedSlots[dateStr]
-    if (!slots) return true
-
-    if (session === 'morning') return !slots.morning
-    if (session === 'sunset') return !slots.sunset
-    return !slots.morning || !slots.sunset
+    // A session is unavailable only when the API marks it true; overlap
+    // between sessions is resolved server-side.
+    return !bookedSlots[dateStr]?.[session]
   }
 
   const getDateStatus = (dateStr) => {
     const slots = bookedSlots[dateStr]
     if (!slots) return 'available'
-    if (slots.morning && slots.sunset) return 'full'
-    return 'partial'
+    const bookedCount = SESSION_KEYS.filter(key => slots[key]).length
+    if (bookedCount === SESSION_KEYS.length) return 'full'
+    if (bookedCount > 0) return 'partial'
+    return 'available'
   }
 
   const handleDateClick = (day) => {
@@ -133,7 +140,8 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
     if (dateObj < todayStart) return
 
     setSelectedDate(dateStr)
-    setSelectedSession('')
+    // Keep a preselected session (e.g. from a plan card) if it is free that day
+    setSelectedSession(prev => (prev && isDateSelectable(dateStr, prev) ? prev : ''))
   }
 
   const handleSessionSelect = (session) => {
@@ -214,6 +222,9 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
     }
   }
 
+  const sessionDisplayLabel = (key) =>
+    `${t(`booking.session.${key}`)} (${sessionTimeRange(key)})`
+
   // Render calendar grid
   const renderCalendar = () => {
     const daysInMonth = getDaysInMonth(currentYear, currentMonth)
@@ -221,9 +232,7 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
     const days = []
 
     // Week day headers
-    const weekDays = lang === 'es'
-      ? ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
-      : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    const weekDays = WEEKDAYS[lang] || WEEKDAYS.es
 
     // Empty cells before first day
     for (let i = 0; i < firstDay; i++) {
@@ -270,7 +279,7 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
             &larr;
           </button>
           <span className="booking-cal-month">
-            {new Date(currentYear, currentMonth).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', {
+            {new Date(currentYear, currentMonth).toLocaleDateString(locale, {
               month: 'long',
               year: 'numeric'
             })}
@@ -305,13 +314,8 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
   const renderSessionSelector = () => {
     if (!selectedDate) return null
 
-    const slots = bookedSlots[selectedDate] || {}
-    const morningAvailable = !slots.morning
-    const afternoonAvailable = !slots.afternoon
-    const sunsetAvailable = !slots.sunset
-
     const dateFormatted = new Date(selectedDate + 'T00:00:00').toLocaleDateString(
-      lang === 'es' ? 'es-ES' : 'en-US',
+      locale,
       { weekday: 'long', day: 'numeric', month: 'long' }
     )
 
@@ -321,45 +325,21 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
         <p className="booking-session-label">{t('booking.selectSession')}</p>
 
         <div className="booking-session-options">
-          <button
-            className={`booking-session-btn ${selectedSession === 'morning' ? 'booking-session-btn--selected' : ''} ${!morningAvailable ? 'booking-session-btn--disabled' : ''}`}
-            onClick={() => handleSessionSelect('morning')}
-            disabled={!morningAvailable}
-          >
-            <span className="booking-session-name">{t('booking.session.morning')}</span>
-            <span className="booking-session-time">10:00 - 14:00</span>
-            {!morningAvailable && <span className="booking-session-status">{t('booking.booked')}</span>}
-          </button>
-
-          <button
-            className={`booking-session-btn ${selectedSession === 'afternoon' ? 'booking-session-btn--selected' : ''} ${!afternoonAvailable ? 'booking-session-btn--disabled' : ''}`}
-            onClick={() => handleSessionSelect('afternoon')}
-            disabled={!afternoonAvailable}
-          >
-            <span className="booking-session-name">{t('booking.session.afternoon')}</span>
-            <span className="booking-session-time">14:30 - 18:30</span>
-            {!afternoonAvailable && <span className="booking-session-status">{t('booking.booked')}</span>}
-          </button>
-
-          <button
-            className={`booking-session-btn ${selectedSession === 'sunset' ? 'booking-session-btn--selected' : ''} ${!sunsetAvailable ? 'booking-session-btn--disabled' : ''}`}
-            onClick={() => handleSessionSelect('sunset')}
-            disabled={!sunsetAvailable}
-          >
-            <span className="booking-session-name">{t('booking.session.sunset')}</span>
-            <span className="booking-session-time">19:00 - 21:30</span>
-            {!sunsetAvailable && <span className="booking-session-status">{t('booking.booked')}</span>}
-          </button>
-
-          <button
-            className={`booking-session-btn ${selectedSession === 'fullday' ? 'booking-session-btn--selected' : ''} ${!afternoonAvailable || !sunsetAvailable ? 'booking-session-btn--disabled' : ''}`}
-            onClick={() => handleSessionSelect('fullday')}
-            disabled={!afternoonAvailable || !sunsetAvailable}
-          >
-            <span className="booking-session-name">{t('booking.session.fullday')}</span>
-            <span className="booking-session-time">14:30 - 20:30</span>
-            {(!afternoonAvailable || !sunsetAvailable) && <span className="booking-session-status">{t('booking.booked')}</span>}
-          </button>
+          {SESSION_KEYS.map(key => {
+            const available = isDateSelectable(selectedDate, key)
+            return (
+              <button
+                key={key}
+                className={`booking-session-btn ${selectedSession === key ? 'booking-session-btn--selected' : ''} ${!available ? 'booking-session-btn--disabled' : ''}`}
+                onClick={() => handleSessionSelect(key)}
+                disabled={!available}
+              >
+                <span className="booking-session-name">{t(`booking.session.${key}`)}</span>
+                <span className="booking-session-time">{sessionTimeRange(key)}</span>
+                {!available && <span className="booking-session-status">{t('booking.booked')}</span>}
+              </button>
+            )
+          })}
         </div>
 
         <button
@@ -376,12 +356,10 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
   // Render booking form
   const renderForm = () => {
     const dateFormatted = new Date(selectedDate + 'T00:00:00').toLocaleDateString(
-      lang === 'es' ? 'es-ES' : 'en-US',
+      locale,
       { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
     )
-    const sessionLabel = selectedSession === 'morning'
-      ? t('booking.session.morning')
-      : t('booking.session.sunset')
+    const sessionLabel = sessionDisplayLabel(selectedSession)
 
     return (
       <div className="booking-form-container">
@@ -492,16 +470,10 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
   // Render success message
   const renderSuccess = () => {
     const dateFormatted = new Date(selectedDate + 'T00:00:00').toLocaleDateString(
-      lang === 'es' ? 'es-ES' : 'en-US',
+      locale,
       { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
     )
-    const sessionLabels = {
-      morning: `${t('booking.session.morning')} (10:00 - 14:00)`,
-      afternoon: `${t('booking.session.afternoon')} (14:30 - 18:30)`,
-      sunset: `${t('booking.session.sunset')} (19:00 - 21:30)`,
-      fullday: `${t('booking.session.fullday')} (14:30 - 20:30)`
-    }
-    const sessionLabel = sessionLabels[selectedSession] || sessionLabels.morning
+    const sessionLabel = sessionDisplayLabel(selectedSession)
 
     return (
       <div className="booking-success">

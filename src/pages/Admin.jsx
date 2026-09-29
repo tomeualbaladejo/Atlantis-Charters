@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
+import { translations } from '../i18n/translations'
+import { sessionTimeRange } from '../lib/sessions.js'
 
 const API_BASE = '/api'
 
@@ -111,13 +113,8 @@ export default function Admin() {
   }
 
   const formatSession = (session) => {
-    const sessions = {
-      morning: 'Mañana (10:00-14:00)',
-      afternoon: 'Tarde (14:30-18:30)',
-      sunset: 'Atardecer (19:00-21:30)',
-      fullday: 'Día completo (14:30-20:30)'
-    }
-    return sessions[session] || sessions.morning
+    const name = translations.es[`booking.session.${session}`]
+    return name ? `${name} (${sessionTimeRange(session)})` : session
   }
 
   // Login screen
