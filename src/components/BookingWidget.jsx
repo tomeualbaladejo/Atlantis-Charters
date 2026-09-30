@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '../contexts/LanguageContext'
 import { calcPrice } from '../../api/_pricing.js'
-import { SESSION_KEYS, sessionTimeRange } from '../lib/sessions.js'
+import { BOOKABLE_SESSION_KEYS, isBookableSession, sessionTimeRange } from '../lib/sessions.js'
 
 const API_BASE = '/api'
 const DATE_LOCALES = { es: 'es-ES', en: 'en-GB', de: 'de-DE', fr: 'fr-FR' }
@@ -32,7 +32,9 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
 
   // Selection state
   const [selectedDate, setSelectedDate] = useState(null)
-  const [selectedSession, setSelectedSession] = useState(initialSession || '')
+  // Ignore a preselection the customer can't book (e.g. half day while it is switched off)
+  const bookableInitialSession = isBookableSession(initialSession) ? initialSession : ''
+  const [selectedSession, setSelectedSession] = useState(bookableInitialSession)
 
   // Form state
   const [step, setStep] = useState('calendar') // 'calendar' | 'form' | 'success'
@@ -72,12 +74,12 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
     if (isOpen) {
       setStep('calendar')
       setSelectedDate(null)
-      setSelectedSession(initialSession || '')
+      setSelectedSession(bookableInitialSession)
       setFormData({ name: '', email: '', phone: '', passengers: '', message: '' })
       setError('')
       setReservationId(null)
     }
-  }, [isOpen, initialSession])
+  }, [isOpen, bookableInitialSession])
 
   // Lock body scroll
   useEffect(() => {
@@ -120,14 +122,14 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
 
     // A session is unavailable only when the API marks it true; overlap
     // between sessions is resolved server-side.
-    return !bookedSlots[dateStr]?.[session]
+    return isBookableSession(session) && !bookedSlots[dateStr]?.[session]
   }
 
   const getDateStatus = (dateStr) => {
     const slots = bookedSlots[dateStr]
     if (!slots) return 'available'
-    const bookedCount = SESSION_KEYS.filter(key => slots[key]).length
-    if (bookedCount === SESSION_KEYS.length) return 'full'
+    const bookedCount = BOOKABLE_SESSION_KEYS.filter(key => slots[key]).length
+    if (bookedCount === BOOKABLE_SESSION_KEYS.length) return 'full'
     if (bookedCount > 0) return 'partial'
     return 'available'
   }
@@ -325,7 +327,7 @@ export default function BookingWidget({ isOpen, onClose, initialSession = '' }) 
         <p className="booking-session-label">{t('booking.selectSession')}</p>
 
         <div className="booking-session-options">
-          {SESSION_KEYS.map(key => {
+          {BOOKABLE_SESSION_KEYS.map(key => {
             const available = isDateSelectable(selectedDate, key)
             return (
               <button
