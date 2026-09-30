@@ -1,8 +1,8 @@
 import { SESSIONS } from '../../api/_pricing.js'
 
-// Half day stays off until Supabase migration 004 (halfday session) is applied;
-// until then a half-day checkout would fail server-side.
-export const HALFDAY_BOOKABLE = false
+// Supabase migration 004 (halfday session) was applied on 2026-09-30.
+// Set to false to hide half day from the booking widget again.
+export const HALFDAY_BOOKABLE = true
 
 // Display order for session pickers and plan cards.
 export const SESSION_KEYS = ['morning', 'halfday', 'fullday', 'afternoon', 'sunset']
